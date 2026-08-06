@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>토스 AL 트레이너</title>
+<style>
+:root{
+  --bg:#F4F4EF; --surface:#FFFFFF; --ink:#1C2422; --muted:#5D6B67;
+  --line:#DDE2DD; --soft:#EAEDE7;
+  --accent:#0E7C6B; --accent-soft:#DDEBE7; --accent-ink:#FFFFFF;
+  --rec:#D64545; --rec-soft:#F9E3E3;
+  --g1:#DCE7E0; --g2:#A8CDBF; --g3:#5FA98F; --g4:#0E7C6B;
+  --shadow:0 1px 3px rgba(28,36,34,.08),0 4px 16px rgba(28,36,34,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#111615; --surface:#1A211F; --ink:#E8ECE9; --muted:#93A19C;
+    --line:#2A332F; --soft:#222B28;
+    --accent:#2FB59F; --accent-soft:#1E3833; --accent-ink:#0B1210;
+    --rec:#E36A6A; --rec-soft:#3A2426;
+    --g1:#20302B; --g2:#2C5347; --g3:#3D8A72; --g4:#2FB59F;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F4F4EF; --surface:#FFFFFF; --ink:#1C2422; --muted:#5D6B67;
+  --line:#DDE2DD; --soft:#EAEDE7;
+  --accent:#0E7C6B; --accent-soft:#DDEBE7; --accent-ink:#FFFFFF;
+  --rec:#D64545; --rec-soft:#F9E3E3;
+  --g1:#DCE7E0; --g2:#A8CDBF; --g3:#5FA98F; --g4:#0E7C6B;
+  --shadow:0 1px 3px rgba(28,36,34,.08),0 4px 16px rgba(28,36,34,.06);
+}
+:root[data-theme="dark"]{
+  --bg:#111615; --surface:#1A211F; --ink:#E8ECE9; --muted:#93A19C;
+  --line:#2A332F; --soft:#222B28;
+  --accent:#2FB59F; --accent-soft:#1E3833; --accent-ink:#0B1210;
+  --rec:#E36A6A; --rec-soft:#3A2426;
+  --g1:#20302B; --g2:#2C5347; --g3:#3D8A72; --g4:#2FB59F;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Pretendard","Segoe UI",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:680px;margin:0 auto;padding:16px 16px 80px}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;cursor:pointer;border:none;border-radius:10px;
+  transition:transform .08s ease, opacity .15s ease}
+button:active{transform:scale(.97)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.screen{display:none}
+.screen.on{display:block}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.btn-primary{background:var(--accent);color:var(--accent-ink);padding:12px 20px;font-weight:700;font-size:15px}
+.btn-ghost{background:var(--soft);color:var(--ink);padding:10px 16px;font-weight:600}
+.btn-quiet{background:none;color:var(--muted);padding:8px 10px;font-weight:600}
+/* ---------- home ---------- */
+.home-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:10px 0 4px}
+.home-head h1{font-size:24px;font-weight:800;letter-spacing:-.01em}
+.home-head h1 .al{color:var(--accent)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.chip strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.chip.hot strong{color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.mode-card h2{font-size:17px;font-weight:800;margin-bottom:2px}
+.mode-card p{margin:4px 0 12px;color:var(--muted);font-size:13.5px}
+.mode-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.part-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-bottom:12px}
+.part-btn{background:var(--soft);color:var(--ink);padding:10px 6px;font-weight:700;font-size:13px;border:2px solid transparent}
+.part-btn small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.part-btn.sel{border-color:var(--accent);background:var(--accent-soft)}
+.grass{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;margin-top:10px}
+.grass i{aspect-ratio:1;border-radius:3px;background:var(--g1)}
+.grass i.l1{background:var(--g2)}.grass i.l2{background:var(--g3)}.grass i.l3{background:var(--g4)}
+.hist-item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.hist-item:last-child{border-bottom:none}
+.hist-item .sc{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.tiny{font-size:12px;color:var(--muted)}
+/* ---------- test ---------- */
+.test-top{display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px}
+.test-top .pos{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.direction{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted);margin-bottom:14px}
+.passage{font-family:Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.8;padding:4px 2px}
+.passage b{color:var(--accent);font-weight:700}
+.passage .pa{color:var(--muted);font-weight:400;padding:0 2px}
+.qtext{font-family:Georgia,serif;font-size:17px;line-height:1.7;margin:10px 0}
+.qintro{font-size:14px;color:var(--muted);line-height:1.6;border-left:3px solid var(--accent);padding-left:12px;margin-bottom:14px}
+.scene-box{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.scene-box svg{display:block;width:100%;height:auto}
+.sched{width:100%;border-collapse:collapse;font-size:13.5px}
+.sched caption{caption-side:top;text-align:left;padding-bottom:8px}
+.sched caption .t1{font-weight:800;font-size:15px}
+.sched caption .t2{color:var(--muted);font-size:12.5px}
+.sched th,.sched td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+.sched th{background:var(--soft);font-size:12px;letter-spacing:.02em}
+.sched td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
+.sched .strike{text-decoration:line-through;color:var(--muted)}
+.sched-foot{font-size:12px;color:var(--muted);margin-top:6px}
+.timer-zone{position:sticky;bottom:0;margin-top:18px;padding:14px 0 10px;
+  background:linear-gradient(to top,var(--bg) 75%,transparent)}
+.timer-card{display:flex;align-items:center;gap:16px;background:var(--surface);
+  border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
+.ring{position:relative;width:74px;height:74px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .track{stroke:var(--soft)}
+.ring .bar{stroke:var(--accent);transition:stroke-dashoffset .3s linear}
+.ring.rec .bar{stroke:var(--rec)}
+.ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:ui-monospace,Consolas,monospace;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.phase-info{flex:1;min-width:0}
+.phase-name{font-weight:800;font-size:15px}
+.phase-name .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rec);margin-right:6px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.phase-name .dot{animation:none}}
+.phase-sub{font-size:12px;color:var(--muted)}
+/* ---------- review ---------- */
+.rv-part{margin:22px 0 8px}
+.rv-card{margin-bottom:12px}
+.rv-q{font-size:13.5px;color:var(--muted);margin-bottom:8px}
+.rv-q b{color:var(--ink)}
+audio{width:100%;height:38px;margin:6px 0}
+details{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--soft)}
+details summary{padding:9px 12px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--accent)}
+details .model-body{padding:2px 14px 12px;font-family:Georgia,serif;font-size:15px;line-height:1.75}
+details .model-body b{color:var(--accent)}
+details .model-note{padding:0 14px 12px;font-size:12.5px;color:var(--muted);font-family:inherit}
+.check-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.check-pill{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;user-select:none}
+.check-pill input{accent-color:var(--accent);margin:0}
+.check-pill:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+.rv-actions{display:flex;gap:10px;margin:20px 0}
+.score-line{font-size:14px;font-weight:700}
+.notice{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+</head><body>
+<div class="wrap">
+
+<!-- ============ HOME ============ -->
+<section id="home" class="screen on">
+  <div class="home-head">
+    <h1>토스 <span class="al">AL</span> 트레이너</h1>
+    <button class="btn-quiet" id="themeBtn" aria-label="테마 전환">◐</button>
+  </div>
+  <div class="chips">
+    <span class="chip">목표까지 <strong id="dday">D-—</strong></span>
+    <span class="chip hot">연속 <strong id="streak">0</strong>일</span>
+    <span class="chip">총 <strong id="totalCnt">0</strong>회 연습</span>
+  </div>
+
+  <div class="stack">
+    <div class="card mode-card">
+      <h2>실전 모드</h2>
+      <p>Q1–Q11 풀세트 · 실제 시험 시간 그대로 · 자동 녹음 (약 20분)</p>
+      <div class="mode-row">
+        <select id="fullSet" aria-label="세트 선택"></select>
+        <button class="btn-primary" id="startFull">시험 시작</button>
+      </div>
+    </div>
+
+    <div class="card mode-card">
+      <h2>파트별 연습</h2>
+      <p>약점 파트만 집중 반복 — AL 갈림길은 Q5–7과 Q11</p>
+      <div class="part-grid" id="partGrid"></div>
+      <div class="mode-row">
+        <select id="partSet" aria-label="세트 선택"></select>
+        <button class="btn-primary" id="startPart">연습 시작</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">연습 잔디 · 최근 10주</div>
+      <div class="grass" id="grass" aria-hidden="true"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">최근 기록</div>
+      <div id="histList"><p class="tiny" style="margin:10px 0 2px">아직 기록이 없어요. 첫 세트를 시작해보세요.</p></div>
+    </div>
+
+    <p class="notice">🎙 시험 시작 시 마이크 권한을 허용해주세요. 녹음은 이 화면을 벗어나면 사라지고, 셀프체크 점수만 기록으로 남습니다.<br>
+    📌 Q3–4는 실사진 대신 일러스트입니다. 시험 2주 전부터는 기출 사진으로 보충하세요.</p>
+  </div>
+</section>
+
+<!-- ============ TEST ============ -->
+<section id="test" class="screen">
+  <div class="test-top">
+    <span class="pos" id="testPos"></span>
+    <button class="btn-quiet" id="exitBtn">나가기 ✕</button>
+  </div>
+  <div class="eyebrow" id="partLabel"></div>
+  <h2 id="partTitle" style="font-size:18px;margin:2px 0 10px"></h2>
+  <div class="direction" id="direction"></div>
+  <div id="stage"></div>
+  <div class="timer-zone">
+    <div class="timer-card">
+      <div class="ring" id="ringWrap">
+        <svg width="74" height="74" viewBox="0 0 74 74" aria-hidden="true">
+          <circle class="track" cx="37" cy="37" r="32" fill="none" stroke-width="6"/>
+          <circle class="bar" id="ringBar" cx="37" cy="37" r="32" fill="none" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="0"/>
+        </svg>
+        <span class="num" id="ringNum">0</span>
+      </div>
+      <div class="phase-info">
+        <div class="phase-name" id="phaseName">준비</div>
+        <div class="phase-sub" id="phaseSub"></div>
+      </div>
+      <button class="btn-ghost" id="skipBtn">다음 ⏵</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEW ============ -->
+<section id="review" class="screen">
+  <div class="test-top">
+    <span class="pos" id="rvSetName"></span>
+    <button class="btn-quiet" id="rvExit">홈으로 ✕</button>
+  </div>
+  <h2 style="font-size:20px">리뷰 &amp; 셀프체크</h2>
+  <p class="tiny">내 녹음을 듣고 → 모범답안과 비교 → 해당되는 항목에 체크하세요. 깊은 첨삭이 필요하면 녹취를 Claude에게 붙여넣으면 됩니다.</p>
+  <div id="rvBody"></div>
+  <div class="rv-actions">
+    <button class="btn-primary" id="saveBtn">기록 저장</button>
+    <span class="score-line" id="scoreLine"></span>
+  </div>
+</section>
+
+</div>
+<script>
+"use strict";
+const SETS =
+[
+/* ============ SET 1 ============ */
+{
+theme:"쇼핑·커피·마케팅",
+q12:[
+ {guide:"Thank you for shopping at *Hartley's* *Furniture*. / This *weekend* only, / we're offering *thirty* percent off / all *sofas*, / *dining* tables, / and *bookshelves*. / Our *design* consultants are here / to help you find the *perfect* piece / for your home. / Don't miss this *limited-time* offer!",
+  tip:"광고문은 밝은 톤. 나열(sofas, dining tables, and bookshelves)은 끝만 내려 읽기."},
+ {guide:"*Attention*, passengers on flight *two-oh-seven* / to *Chicago*. / Due to *heavy* rain, / your departure has been *delayed* / by approximately *forty* minutes. / *Boarding* will now begin / at gate *fifteen* / at *six* thirty. / We *apologize* for the inconvenience / and *thank* you for your patience.",
+  tip:"공지문은 차분한 톤. 숫자(207, 15, 6:30)를 또박또박."},
+],
+q34:[
+ {scene:{bg:'cafe',items:[['p',90,'stand',5,0],['prop','counter',40,150],['p',270,'hold',1,1,1],['prop','table',360],['prop','cuptable',392],['prop','chair',455,-1],['p',470,'sit',0,2,1]]},
+  model:"This is a picture of a <b>coffee shop</b>. On the left, a barista is <b>standing behind the counter</b>, ready to take orders. In the middle, a woman is <b>holding a cup of coffee</b>. On the right, a man is <b>sitting at a round table</b> near his drink. In the background, I can see a large menu board on the wall. It seems like a <b>relaxing afternoon</b> at the café.",
+  tip:"장소 → 왼쪽/가운데/오른쪽 순서로 훑고 마지막에 느낌 한 줄."},
+ {scene:{bg:'office',items:[['p',95,'type',0,1],['prop','desk',115,100],['prop','laptop',140],['p',330,'type',4,0],['prop','desk',350,100],['prop','laptop',375],['p',530,'hold',2,3,1],['prop','plant',480]]},
+  model:"This picture shows a <b>modern office</b>. Two employees are <b>sitting at their desks and typing on laptops</b>. On the right, another worker is <b>standing with a cup of coffee</b>, taking a short break. There are large windows and a plant, so the office looks <b>bright and comfortable</b>. Everyone seems to be <b>focused on their work</b>.",
+  tip:"인물이 여럿이면 '공통 동작 → 예외 인물' 순서가 빠르다."},
+],
+q57:{intro:"Imagine that a Canadian marketing firm is doing research in your country. You have agreed to participate in a telephone interview about coffee shops.",
+ qs:[
+  {t:15,q:"How often do you go to coffee shops, and who do you usually go with?",
+   model:"I go to coffee shops <b>two or three times a week</b>, and I usually go with <b>my coworkers</b> after lunch."},
+  {t:15,q:"When was the last time you visited a coffee shop, and what did you order?",
+   model:"The last time I visited a coffee shop was <b>yesterday afternoon</b>, and I ordered <b>an iced americano and a slice of cheesecake</b>."},
+  {t:30,q:"What do you consider most important when choosing a coffee shop? Why?",
+   model:"When I choose a coffee shop, the most important thing is <b>the atmosphere</b>. This is because I usually go there <b>to relax or to focus on my work</b>. If a café is too noisy or crowded, I can't concentrate at all. Also, comfortable chairs and good music <b>make me stay longer</b>. That's why atmosphere matters most to me."},
+ ]},
+q810:{head:"Sunrise Marketing Conference",sub:"Saturday, October 17 · Grandview Hotel, 3rd Floor",
+ rows:[["9:00 – 9:30","Registration & Welcome Coffee","Lobby"],
+  ["9:30 – 10:30","Keynote: The Future of Online Advertising","Dr. Emma Collins"],
+  ["10:30 – 12:00","Workshop: Social Media Strategy","Mark Reyes"],
+  ["12:00 – 1:00","Lunch (provided)","Garden Hall"],
+  ["1:00 – 2:30","Panel: Branding for Small Businesses","3 Guest Speakers"],
+  ["2:30 – 3:30","Networking Session","Rooftop Lounge"]],
+ foot:"Registration fee: $40 (lunch included)",
+ caller:"Hi, this is Daniel Brooks. I'm planning to attend the marketing conference, but I lost my schedule. I was hoping you could answer a few questions.",
+ qs:[
+  {t:15,q:"What time does the conference start, and where is it being held?",
+   model:"The conference starts at <b>nine o'clock in the morning</b> with registration, and it will be held at the <b>Grandview Hotel, on the third floor</b>."},
+  {t:15,q:"I heard the registration fee is fifty dollars. Is that right?",
+   model:"I'm sorry, but that information is <b>incorrect</b>. The registration fee is <b>forty dollars</b>, and <b>lunch is included</b> in the price."},
+  {t:30,q:"I'm especially interested in the sessions in the morning. Could you tell me all the details of the sessions before lunch?",
+   model:"Sure. There are <b>two sessions</b> in the morning. First, from <b>nine thirty to ten thirty</b>, there will be a keynote speech titled <b>'The Future of Online Advertising'</b> by Dr. Emma Collins. After that, from <b>ten thirty to twelve</b>, Mark Reyes will lead a workshop on <b>social media strategy</b>."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'Technology has made it easier for people to focus on their work.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>disagree</b> with the statement that technology has made it easier to focus on work. I have <b>two reasons</b> for this. <b>First of all</b>, smartphones constantly interrupt us. <b>For example</b>, when I'm working, I get messages and app notifications every few minutes, so I often lose my concentration. <b>Secondly</b>, social media is very addictive. Many people, including me, open YouTube or Instagram for a minute and end up spending half an hour. <b>For these reasons</b>, I believe technology actually makes it harder, not easier, to focus on work.",
+ note:"입장 → 이유1+예시 → 이유2+예시 → 마무리. 이 틀 하나로 대부분의 찬반 문제를 커버할 수 있다."},
+},
+/* ============ SET 2 ============ */
+{
+theme:"운동·공원·면접",
+q12:[
+ {guide:"You've reached *Green Valley* *Fitness* Center. / We're open *Monday* through *Friday* / from *six* a.m. to *ten* p.m., / and on *weekends* / from *eight* a.m. to *six* p.m. / To speak with a *trainer*, / press *one*. / For questions about *membership*, / please *stay* on the line.",
+  tip:"자동응답 멘트는 또렷하고 일정한 속도로. 요일·시간 강세."},
+ {guide:"*Welcome* aboard the *City Explorer* tour bus! / Today we'll visit the *art* museum, / the *central* market, / and the *riverside* park. / Our first stop is in *ten* minutes, / so please keep your *ticket* ready. / If you have any *questions*, / our friendly staff / are *happy* to help.",
+  tip:"관광 안내는 활기차게. 나열 억양(museum↗, market↗, park↘) 연습 포인트."},
+],
+q34:[
+ {scene:{bg:'park',items:[['prop','tree',90,1.1],['prop','tree',530,0.85],['p',150,'read',3,0],['prop','bench',240],['p',285,'sit',1,2],['p',450,'walk',6,1,1]]},
+  model:"This is a picture of a <b>park on a sunny day</b>. In the middle, a woman is <b>sitting on a bench</b> and taking a rest. On the left, a man is <b>standing and reading a book</b>. On the right, another person is <b>walking</b>, and she looks like she is exercising. There are <b>big green trees</b> on both sides. Overall, it looks like a <b>peaceful afternoon</b> in the park.",
+  tip:"날씨·시간대 언급(on a sunny day)은 쉬운 가산점 요소."},
+ {scene:{bg:'store',items:[['prop','shelf',40],['prop','fruitstand',390],['p',200,'cart',2,1],['prop','cart',228],['p',500,'hold',4,3,1],['p',120,'read',0,2]]},
+  model:"This picture was taken at a <b>grocery store</b>. In the middle, a man is <b>pushing a shopping cart</b>. On the left, a woman is <b>looking at her shopping list</b> in front of a shelf. On the right, another customer is <b>picking up some fruit</b>. The shelves are <b>full of colorful products</b>. It seems like a <b>busy shopping day</b>.",
+  tip:"동작 동사(push, pick up, look at)를 다양하게 — 전부 stand로 뭉개지 않기."},
+],
+q57:{intro:"Imagine that a health magazine is preparing an article about exercise habits. You have agreed to participate in a telephone interview about exercise.",
+ qs:[
+  {t:15,q:"How often do you exercise, and what kind of exercise do you usually do?",
+   model:"I exercise <b>about three times a week</b>, and I usually <b>go jogging</b> near my house or <b>do simple workouts</b> at home."},
+  {t:15,q:"Where do you usually exercise, at home or at a gym? Why?",
+   model:"I usually exercise <b>at home</b> because it <b>saves time and money</b>. I can work out whenever I want without traveling anywhere."},
+  {t:30,q:"Do you think people these days exercise more than in the past? Why or why not?",
+   model:"Yes, I think people exercise <b>more than in the past</b>. <b>First</b>, people care more about their health these days, so many of them go to the gym or do yoga after work. <b>Also</b>, social media has made exercise popular. <b>For example</b>, many people share their workout routines online, and this motivates others to start exercising too."},
+ ]},
+q810:{head:"Job Interview Schedule — Marketing Assistant Position",sub:"Tuesday, November 3 · Meeting Room B",
+ rows:[["9:30","Kevin Park","Bright Ads Inc., 3 years"],
+  ["10:30","Sarah Kim","Fresh Media, 2 years"],
+  ["11:30","Daniel Lee","No experience (recent graduate)"],
+  ["1:30","Michelle Choi","Star Marketing, 5 years"],
+  ["2:30","James Han","Cancelled"],
+  ["3:30","Laura Jung","Blue Ocean PR, 4 years"]],
+ foot:"Each interview: 40 minutes · Resumes available at the front desk",
+ caller:"Hello, this is Angela from the HR team. I'm supposed to lead the interviews tomorrow, but I left my schedule at home. Could you help me with a few details?",
+ qs:[
+  {t:15,q:"What time is the first interview, and who is the candidate?",
+   model:"The first interview is at <b>nine thirty in the morning</b>, and the candidate is <b>Kevin Park</b>, who has three years of experience at Bright Ads."},
+  {t:15,q:"I remember James Han is coming in at two thirty. Is that correct?",
+   model:"Actually, I'm afraid that's <b>not correct</b>. James Han's interview has been <b>cancelled</b>, so you don't need to prepare for that one."},
+  {t:30,q:"I'd like to meet the candidates with the most experience. Can you give me all the details about the candidates who have four or more years of experience?",
+   model:"Of course. There are <b>two candidates</b> with four or more years of experience. <b>Michelle Choi</b>, who has <b>five years</b> of experience at Star Marketing, will be interviewed at <b>one thirty</b>. Then at <b>three thirty</b>, you'll meet <b>Laura Jung</b>, who has <b>four years</b> of experience at Blue Ocean PR."},
+ ]},
+q11:{q:"Which of the following is the most important quality of a good manager? Choose one and give specific reasons: (a) Communication skills (b) Professional knowledge (c) A sense of humor",
+ model:"In my opinion, the most important quality of a good manager is <b>communication skills</b>. I have two reasons. <b>First</b>, managers need to explain their goals clearly. If a manager doesn't communicate well, team members get confused and <b>waste time on the wrong tasks</b>. <b>Second</b>, good communication builds trust. <b>For example</b>, my former team leader always listened to our opinions and gave us clear feedback, so everyone <b>trusted her and worked harder</b>. Professional knowledge is also useful, but without communication, it cannot be shared with the team. <b>Therefore</b>, I believe communication skills matter most.",
+ note:"선택형은 고른 것 + 안 고른 것 한 줄 비교(but without…)가 고득점 포인트."},
+},
+/* ============ SET 3 ============ */
+{
+theme:"영화·도서관·수업",
+q12:[
+ {guide:"Good *morning*, and thank you for tuning in to *Radio Nine*. / It's going to be a *beautiful* day today, / with *clear* skies / and a high of *twenty-four* degrees. / However, / *rain* is expected / *late* in the evening, / so don't forget your *umbrella*. / Now, / let's move on to the *traffic* update.",
+  tip:"날씨 방송 톤. However 앞뒤로 확실히 끊고 톤 전환."},
+ {guide:"*Attention*, shoppers. / For the *next* thirty minutes, / all *bakery* items are *twenty* percent off. / Freshly baked *bread*, / *cookies*, / and *seasonal* cakes / are waiting for you / in aisle *seven*. / Also, / don't forget to visit our *dairy* section / for today's special on *cheese*. / *Happy* shopping!",
+  tip:"매장 방송. bread↗, cookies↗, cakes↘ 나열 억양 + aisle(발음 /aɪl/) 주의."},
+],
+q34:[
+ {scene:{bg:'library',items:[['prop','bookshelf',40],['prop','bookshelf',480],['p',200,'type',7,0],['prop','desk',220,140],['prop','laptop',250],['p',430,'read',2,1,1]]},
+  model:"This is a picture of a <b>library</b>. In the middle, a student is <b>sitting at a desk and typing on a laptop</b>. On the right, a man is <b>standing and reading a book</b> in front of a tall bookshelf. There are bookshelves <b>full of books</b> on both sides of the room. The library looks <b>very quiet</b>, and everyone seems to be <b>concentrating on their studies</b>.",
+  tip:"'It looks quiet' 같은 분위기 묘사로 마무리하면 30초가 딱 맞는다."},
+ {scene:{bg:'street',items:[['prop','crosswalk'],['p',210,'walk',0,0],['p',320,'walk',4,2,1],['p',480,'hold',1,1],['p',100,'stand',6,3],['prop','suitcase',122]]},
+  model:"This picture shows a <b>busy street in a city</b>. In the middle, two people are <b>crossing the road</b> at a crosswalk, walking in opposite directions. On the left, a man is <b>standing with his suitcase</b>, and he might be waiting for a taxi. On the right, a woman is <b>drinking something</b> while standing. In the background, there are <b>tall buildings</b>. It looks like a <b>typical morning</b> in a downtown area.",
+  tip:"추측 표현(might be, seems to be)은 AL 채점 포인트 — 최소 1회 사용."},
+],
+q57:{intro:"Imagine that a movie streaming service is doing market research in your area. You have agreed to answer some questions about watching movies.",
+ qs:[
+  {t:15,q:"How often do you watch movies, and where do you usually watch them?",
+   model:"I watch movies <b>about once or twice a week</b>, and I usually watch them <b>at home on streaming services</b> like Netflix."},
+  {t:15,q:"What kind of movies do you like the most?",
+   model:"I like <b>action movies</b> the most because they are <b>exciting and easy to enjoy</b> after a long day at work."},
+  {t:30,q:"Do you prefer watching movies at home or at a movie theater? Why?",
+   model:"I prefer watching movies <b>at home</b>. <b>First of all</b>, it's much more comfortable. I can watch movies on my sofa, pause anytime, and eat whatever I want. <b>Second</b>, it's cheaper. Movie tickets and popcorn are getting expensive, but streaming services cost <b>less than ten dollars a month</b>. So watching at home is the better option for me."},
+ ]},
+q810:{head:"Community Center — Photography Class Schedule",sub:"Beginner Course · Every Saturday in March · Room 204",
+ rows:[["March 7, 10:00","Camera Basics: Settings & Modes","Instructor: Tom White"],
+  ["March 14, 10:00","Outdoor Shooting: Natural Light","City Park (meet at gate)"],
+  ["March 21, 10:00","Portrait Photography","Studio A"],
+  ["March 28, 10:00","Photo Editing on Your Phone","Bring your smartphone"]],
+ foot:"Course fee: $60 for 4 classes · Camera rental available for $5 per class",
+ caller:"Hi, my name is Lisa Park. I signed up for the beginner photography course, but I can't find the schedule you emailed me. Can I ask you a few things?",
+ qs:[
+  {t:15,q:"When does the course begin, and where is the first class?",
+   model:"The course begins on <b>March seventh at ten a.m.</b>, and the first class will be held in <b>Room two-oh-four</b> at the community center."},
+  {t:15,q:"I don't have my own camera. Does that mean I can't take the course?",
+   model:"Don't worry, that's <b>not a problem</b>. You can <b>rent a camera for five dollars per class</b>, so you can still take the course without your own camera."},
+  {t:30,q:"I'm most interested in the classes where we go outside or take pictures of people. Could you tell me about those classes in detail?",
+   model:"Sure. There are <b>two classes</b> you'd be interested in. On <b>March fourteenth</b>, there's an outdoor shooting class about <b>natural light</b>, and it will take place at <b>City Park</b> — you should meet at the gate. Then on <b>March twenty-first</b>, there's a <b>portrait photography</b> class, which will be held in <b>Studio A</b>."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'Companies should require employees to wear formal clothes at work.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>disagree</b> with the idea that companies should require formal clothes. There are two reasons. <b>First</b>, comfortable clothes improve productivity. When people wear stiff suits all day, they feel tired easily, but in casual clothes, they can <b>focus better on their work</b>. <b>Second</b>, dress codes don't match today's work culture. <b>For example</b>, many successful IT companies allow free dress, and their employees are more creative and satisfied. Of course, formal clothes may be necessary for meeting clients, but on normal days, <b>what we wear doesn't affect the quality of our work</b>. Therefore, I don't think formal dress codes are necessary.",
+ note:"'Of course ~ but' 양보 구문 한 번이면 논리 점수가 올라간다."},
+},
+/* ============ SET 4 ============ */
+{
+theme:"출장·회의·도시생활",
+q12:[
+ {guide:"*Welcome*, everyone, / to the *tenth* annual *City Business* Awards. / Tonight, / we will *celebrate* the achievements / of *local* entrepreneurs, / *small* business owners, / and *community* leaders. / Before we *begin*, / please *silence* your mobile phones / and find your *seats*. / We hope you *enjoy* the evening!",
+  tip:"행사 사회 멘트. 시작은 천천히, Welcome/celebrate 강세 크게."},
+ {guide:"Are you *tired* of cooking every night? / Then visit *Bella's* *Kitchen*, / the newest *Italian* restaurant downtown. / We offer *fresh* pasta, / *wood-fired* pizza, / and *homemade* desserts. / This month, / get a *free* drink / with any *dinner* order. / *Bella's* Kitchen — / where *every* meal feels special!",
+  tip:"광고 특유의 리듬. 질문문(Are you tired...?)은 끝을 올리기."},
+],
+q34:[
+ {scene:{bg:'meeting',items:[['prop','screen',390],['p',330,'present',0,1],['p',150,'sit',3,0],['p',225,'sit',5,2],['prop','desk',120,190]]},
+  model:"This is a picture of a <b>business meeting</b>. On the right, a man is <b>standing and giving a presentation</b>, pointing at a large screen. Two colleagues are <b>sitting at a long table</b> and listening to him. On the screen, there is a chart with some text. The atmosphere seems <b>professional but comfortable</b>. They might be <b>discussing a new project</b>.",
+  tip:"프레젠테이션 장면 단골 표현: give a presentation, point at the screen."},
+ {scene:{bg:'airport',items:[['p',140,'stand',6,0],['prop','suitcase',165],['prop','bench',300],['p',345,'sit',1,3],['p',510,'walk',4,1,1]]},
+  model:"This picture was taken at an <b>airport</b>. On the left, a man is <b>standing next to his suitcase</b>, looking at the departure board. In the middle, a woman is <b>sitting on a bench</b>, probably waiting for her flight. On the right, another passenger is <b>walking quickly</b>, so she might be late for boarding. In the background, I can see a <b>departure board and large windows</b>. It looks like a <b>busy day for traveling</b>.",
+  tip:"공항·역 장면은 '기다리는 사람 vs 서두르는 사람' 대비로 묘사하면 쉽다."},
+],
+q57:{intro:"Imagine that a travel agency is doing a survey about traveling. You have agreed to participate in a telephone interview about trips and vacations.",
+ qs:[
+  {t:15,q:"When was your last trip, and where did you go?",
+   model:"My last trip was <b>about two months ago</b>. I went to <b>Busan</b> with my friends and stayed there for the weekend."},
+  {t:15,q:"Do you prefer traveling alone or with other people?",
+   model:"I prefer traveling <b>with other people</b> because I can <b>share good memories</b> with them, and it also feels safer."},
+  {t:30,q:"When you travel, do you prefer to plan everything in advance, or decide things during the trip? Why?",
+   model:"I prefer to <b>plan everything in advance</b>. <b>First</b>, planning saves time and money. If I book hotels and transportation early, I can get <b>better prices</b> and avoid wasting time. <b>Also</b>, I feel less stressed when I have a clear schedule. <b>For example</b>, on my last trip, I made a daily plan, so I could visit all the places I wanted without any problems."},
+ ]},
+q810:{head:"Business Trip Itinerary — David Miller",sub:"Toronto Office Visit · Wednesday, September 9",
+ rows:[["8:00","Flight AC 452 departs (Terminal 2)",""],
+  ["10:30","Arrive in Toronto · Taxi to Maple Hotel",""],
+  ["12:00","Lunch with regional director","Hotel Restaurant"],
+  ["2:00","Product demonstration","Toronto Office, Room 5"],
+  ["4:00","Contract meeting with Northline Co.","Cancelled — moved to video call, Sept 11"],
+  ["6:30","Dinner with sales team","Riverside Grill"]],
+ foot:"Return flight: September 10, 9:00 a.m.",
+ caller:"Hi, this is David Miller. I'm leaving for Toronto tomorrow, but I don't have my itinerary with me right now. Could you check a few things for me?",
+ qs:[
+  {t:15,q:"What time does my flight leave, and from which terminal?",
+   model:"Your flight, AC four-five-two, departs at <b>eight a.m.</b> from <b>Terminal two</b>, so you should arrive at the airport early."},
+  {t:15,q:"I have a contract meeting with Northline at four o'clock, right?",
+   model:"Actually, there's been <b>a change</b>. The contract meeting has been <b>cancelled</b> and moved to <b>a video call on September eleventh</b>, so your four o'clock is now free."},
+  {t:30,q:"Can you tell me everything that's scheduled after I arrive at the hotel, before dinner?",
+   model:"Certainly. <b>First</b>, at <b>twelve o'clock</b>, you'll have <b>lunch with the regional director</b> at the hotel restaurant. <b>Then</b>, at <b>two p.m.</b>, you're scheduled to give a <b>product demonstration</b> at the Toronto office, in <b>Room five</b>. After that, your afternoon is free until dinner at six thirty."},
+ ]},
+q11:{q:"Some people prefer to live in a big city. Others prefer to live in a small town. Which do you prefer and why? Give specific reasons or examples to support your opinion.",
+ model:"I prefer living in <b>a big city</b>. There are two main reasons. <b>First</b>, big cities offer more opportunities. There are <b>more jobs, schools, and cultural events</b>, so people have more choices for their careers and hobbies. <b>Second</b>, life in a city is very convenient. <b>For example</b>, in my city, I can use the subway anytime, and hospitals, banks, and shopping malls are all <b>within walking distance</b>. Small towns may be quieter and cleaner, but I think convenience and opportunity are more important, especially for young people. <b>For these reasons</b>, I would choose to live in a big city.",
+ note:"비교형도 찬반 틀 그대로: 선택 → 이유2개 → 반대편 양보 → 재강조."},
+},
+/* ============ SET 5 ============ */
+{
+theme:"스마트폰·헬스장·클래스",
+q12:[
+ {guide:"*Welcome* to the *National* History Museum. / Today's *special* exhibition, / 'Life in *Ancient* Times,' / is located on the *second* floor. / *Guided* tours begin / every hour / at the *main* entrance. / Please note that / *photography* is *not* allowed / inside the exhibition halls. / *Enjoy* your visit!",
+  tip:"안내 방송. not allowed의 not을 분명하게 — 부정어는 항상 강세."},
+ {guide:"Here's your *morning* traffic update. / Traffic is moving *slowly* / on *Highway* Twelve / due to *road* construction. / Drivers heading *downtown* / should take *Oak* Street instead. / Meanwhile, / *public* transportation / is running *on* schedule. / We'll be back / with another update / in *thirty* minutes.",
+  tip:"교통 방송. 지명(Highway Twelve, Oak Street) 또박또박 + instead 강조."},
+],
+q34:[
+ {scene:{bg:'cafe',items:[['prop','table',70],['prop','cuptable',102],['prop','chair',55,-1],['p',135,'sit',5,0,1],['p',230,'stand',2,1],['p',300,'stand',6,2],['p',415,'stand',0,3],['prop','counter',350,180]]},
+  model:"This is a picture of a <b>café</b>. On the right, two customers are <b>standing in line</b> in front of the counter, waiting to order. A staff member is <b>standing behind the counter</b> to serve them. On the left, a woman is <b>sitting at a table</b> with a cup of coffee. In the background, there is a menu board on the wall. The café seems <b>quite popular</b>, and it looks like <b>a busy morning</b>.",
+  tip:"'standing in line / waiting to order' — 줄 서는 장면 단골 콜로케이션."},
+ {scene:{bg:'gym',items:[['prop','treadmill',60],['p',270,'walk',1,0],['p',390,'present',4,2],['p',510,'hold',6,1,1]]},
+  model:"This picture shows people <b>exercising at a gym</b>. In the middle, a man is <b>walking fast</b>, maybe warming up. Next to him, a woman is <b>stretching with her arm raised</b>. On the right, another person is <b>drinking water</b> after a workout. On the left, I can see <b>a treadmill</b>, and there is a large mirror on the wall. Everyone looks <b>energetic and focused on their exercise</b>.",
+  tip:"동작을 모르겠으면 'maybe warming up'처럼 추측으로 연결하면 자연스럽다."},
+],
+q57:{intro:"Imagine that a technology company is doing research about smartphone use. You have agreed to participate in a telephone survey about smartphones.",
+ qs:[
+  {t:15,q:"How many hours a day do you use your smartphone, and what do you use it for the most?",
+   model:"I use my smartphone <b>about four or five hours a day</b>, and I use it mostly for <b>messaging and watching videos</b>."},
+  {t:15,q:"When did you buy your current smartphone?",
+   model:"I bought my current smartphone <b>about a year ago</b>, and I'm still <b>quite satisfied</b> with it."},
+  {t:30,q:"What is the most important feature you consider when buying a new smartphone? Why?",
+   model:"The most important feature for me is <b>battery life</b>. This is because I use my phone all day long — <b>for work, messages, and videos</b> — so a weak battery would be really inconvenient. <b>For example</b>, my old phone used to die every afternoon, and I had to carry a charger everywhere. That was very stressful, so now I always <b>check the battery capacity first</b> when I choose a new phone."},
+ ]},
+q810:{head:"Riverside Community Center — Fall Class Schedule",sub:"September Classes · Registration opens August 20",
+ rows:[["Mondays 6:00 p.m.","Beginner Guitar","Mr. Owen Reed · $50/month"],
+  ["Tuesdays 7:00 p.m.","Yoga for Everyone","Ms. Dana Cruz · $40/month"],
+  ["Wednesdays 6:30 p.m.","Creative Writing","Ms. Helen Park · $45/month"],
+  ["Thursdays 7:00 p.m.","Home Cooking Basics","Chef Marco Rossi · $65/month"],
+  ["Saturdays 10:00 a.m.","Watercolor Painting","Mr. Ian Bell · $55/month"]],
+ foot:"All materials included except Guitar (bring your own instrument)",
+ caller:"Hello, this is Rachel Kim. I'm interested in taking a class at the community center this fall, but I can't open the schedule on your website. May I ask a few questions?",
+ qs:[
+  {t:15,q:"When does registration open, and how much is the yoga class?",
+   model:"Registration opens on <b>August twentieth</b>, and the yoga class costs <b>forty dollars a month</b>. It meets on Tuesdays at seven p.m."},
+  {t:15,q:"I heard that all class materials are included in the fee. Is that right?",
+   model:"That's <b>mostly right</b>, but there is <b>one exception</b>. For the beginner guitar class, you need to <b>bring your own instrument</b>. All other classes include materials."},
+  {t:30,q:"I'm only available on weekday evenings after 6:30. Could you tell me all the classes I can take?",
+   model:"Sure. There are <b>three classes</b> that start at six thirty or later on weekdays. On <b>Tuesdays at seven</b>, there's <b>yoga</b> with Ms. Dana Cruz for forty dollars a month. On <b>Wednesdays at six thirty</b>, there's <b>creative writing</b> with Ms. Helen Park for forty-five dollars. And on <b>Thursdays at seven</b>, there's <b>home cooking basics</b> with Chef Marco Rossi for sixty-five dollars a month."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'It is better to work in a team than to work alone.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>agree</b> that working in a team is better than working alone. I have two reasons. <b>First</b>, teams can share different ideas. When people with different backgrounds work together, they can find <b>more creative solutions</b> than one person thinking alone. <b>Second</b>, teamwork makes big projects possible. <b>For example</b>, at my company, we recently finished a large project in just one month because we <b>divided the work</b> based on each member's strengths. If I had done it alone, it would have taken half a year. Working alone may be faster for small tasks, but for important work, <b>two heads are better than one</b>. Therefore, I prefer working in a team.",
+ note:"속담(two heads are better than one) 하나 넣으면 어휘 점수에 도움."},
+},
+/* ============ SET 6 ============ */
+{
+theme:"쇼핑습관·주방·세미나",
+q12:[
+ {guide:"*Good* morning, everyone, / and *welcome* to your first day / at *Corewell* Industries. / Today's *orientation* will cover / our company *history*, / *safety* guidelines, / and your *team* assignments. / Lunch will be *provided* / in the *staff* cafeteria at noon. / If you have *any* questions, / please don't *hesitate* to ask.",
+  tip:"오리엔테이션 환영사. 따뜻하고 안정된 톤, don't hesitate 연음 주의."},
+ {guide:"Looking for your *next* great read? / Visit *Chapter One*, / the city's *largest* independent bookstore. / This week, / all *mystery* novels, / *cookbooks*, / and *children's* books / are *fifteen* percent off. / Plus, / join our *free* membership program / and earn *points* with every purchase. / See you at *Chapter One*!",
+  tip:"서점 광고. 나열 세 개 + percent off 숫자 강세 연습."},
+],
+q34:[
+ {scene:{bg:'street',items:[['prop','crosswalk'],['prop','bench',170],['p',215,'sit',0,1],['p',360,'read',5,0],['p',490,'walk',2,2,1]]},
+  model:"This is a picture of a <b>street in a city</b>. On the left, a man is <b>sitting on a bench</b>, and he seems to be waiting for a bus. In the middle, a woman is <b>standing and looking at her phone</b>. On the right, another person is <b>walking</b> along the sidewalk. In the background, there are <b>several tall buildings</b> with many windows. It looks like <b>an ordinary weekday afternoon</b> downtown.",
+  tip:"read 포즈는 '핸드폰 보는 중'으로도 묘사 가능 — 그림에 얽매이지 말고 자연스럽게."},
+ {scene:{bg:'kitchen',items:[['p',120,'stand',1,0],['prop','counter',60,190],['p',350,'carry',4,2],['p',500,'hold',6,1,1]]},
+  model:"This picture was taken in a <b>restaurant kitchen</b>. On the left, a chef is <b>standing behind the counter</b>, preparing food. In the middle, a worker is <b>carrying a large box</b> of ingredients. On the right, another staff member is <b>holding a drink</b>, taking a short break. There are <b>cooking tools and equipment</b> in the background. Everyone seems <b>busy</b>, so it might be <b>just before lunchtime</b>.",
+  tip:"'It might be just before lunchtime' — 시간 추측 마무리는 어디에나 쓸 수 있다."},
+],
+q57:{intro:"Imagine that a consumer research company is conducting a survey about shopping habits. You have agreed to answer some questions about shopping.",
+ qs:[
+  {t:15,q:"How often do you go shopping for clothes, and where do you usually shop?",
+   model:"I go shopping for clothes <b>about once a month</b>, and I usually shop <b>online</b> or at a big shopping mall near my home."},
+  {t:15,q:"What was the last item you bought, and were you satisfied with it?",
+   model:"The last item I bought was <b>a pair of running shoes</b>, and I was <b>very satisfied</b> because they were comfortable and on sale."},
+  {t:30,q:"Do you usually compare prices before buying something? Why or why not?",
+   model:"Yes, I <b>always compare prices</b> before buying something. <b>The main reason</b> is that the same product can have very different prices depending on the store. <b>For example</b>, when I bought my running shoes, I checked three websites and found a <b>twenty percent difference</b> between the cheapest and the most expensive one. It only takes a few minutes, but it <b>saves a lot of money</b>, so I think comparing prices is a smart habit."},
+ ]},
+q810:{head:"Time Management Seminar — Agenda",sub:"Friday, June 12 · Harborview Business Center, Room 301",
+ rows:[["9:00 – 9:20","Opening Remarks","Ms. Grace Lin, Organizer"],
+  ["9:20 – 10:30","Lecture: Setting Priorities","Dr. Alan Foster"],
+  ["10:30 – 10:45","Coffee Break",""],
+  ["10:45 – 12:00","Workshop: Planning Your Week","Dr. Alan Foster"],
+  ["12:00 – 1:00","Lunch","Not provided — restaurants nearby"],
+  ["1:00 – 2:30","Group Discussion: Avoiding Distractions","Ms. Grace Lin"],
+  ["2:30 – 3:00","Q&A and Closing",""]],
+ foot:"Participation fee: $25 · Certificates provided upon completion",
+ caller:"Hi, this is Brian Cho. I registered for the time management seminar this Friday, but I deleted the email with the agenda by mistake. Could you answer a few questions?",
+ qs:[
+  {t:15,q:"Where is the seminar being held, and what time does it start?",
+   model:"The seminar will be held at the <b>Harborview Business Center, in Room three-oh-one</b>, and it starts at <b>nine a.m.</b> with opening remarks."},
+  {t:15,q:"Lunch is provided at the seminar, isn't it?",
+   model:"I'm afraid <b>that's not correct</b>. Lunch is <b>not provided</b>, but there are <b>several restaurants nearby</b>, so you can eat around the business center."},
+  {t:30,q:"Dr. Foster is my favorite speaker. Could you tell me about all the sessions he is leading?",
+   model:"Of course. Dr. Alan Foster is leading <b>two sessions</b>, both in the morning. <b>First</b>, from <b>nine twenty to ten thirty</b>, he'll give a lecture on <b>setting priorities</b>. <b>Then</b>, after a short coffee break, he'll lead a workshop called <b>'Planning Your Week'</b> from <b>ten forty-five to noon</b>."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'University students should have a part-time job before they graduate.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>agree</b> that university students should have a part-time job before graduating. There are two reasons. <b>First</b>, part-time jobs teach real-world skills. Students can learn <b>how to communicate with customers and coworkers</b>, which they can never learn from textbooks. <b>Second</b>, working helps students understand the value of money. <b>For example</b>, when I worked at a café in college, I realized how hard it was to earn money, so I <b>stopped wasting it</b> on unnecessary things. Some people say students should focus only on studying, but I believe a few hours of work per week <b>doesn't hurt their grades</b>. Therefore, I think part-time experience is valuable for every student.",
+ note:"반대 의견 언급(Some people say ~) 후 재반박하면 60초가 자연스럽게 채워진다."},
+},
+/* ============ SET 7 ============ */
+{
+theme:"음악·라운지·공연",
+q12:[
+ {guide:"*Attention*, passengers. / Flight *six-two-one* to *Denver* / is now *boarding* / at gate *twenty-two*. / Passengers with *small* children / and those needing *special* assistance / may board *first*. / Please have your *boarding* pass / and *photo* I.D. ready. / Thank you for flying with *Skyline* Airlines.",
+  tip:"공항 방송 표준 문형. boarding pass / photo ID 복합명사 강세는 앞 단어에."},
+ {guide:"*Welcome* back to 'Cooking with *Claire*'! / Today, / we're making a *classic* tomato pasta / with only *five* ingredients. / It's *quick*, / it's *healthy*, / and it's *perfect* for busy weeknights. / Before we start, / make sure your *water* is boiling / and your *ingredients* are ready. / Let's get *cooking*!",
+  tip:"방송 진행 톤. It's quick, / it's healthy, / it's perfect — 병렬 리듬 살리기."},
+],
+q34:[
+ {scene:{bg:'office',items:[['prop','plant',60],['prop','table',180],['prop','cuptable',212],['p',150,'hold',3,0,1],['p',300,'hold',0,2],['prop','chair',430,-1],['p',445,'sit',6,1,1]]},
+  model:"This is a picture of an <b>office lounge</b>. In the middle, two coworkers are <b>standing and talking</b> while holding cups of coffee. They seem to be <b>having a casual conversation</b> during a break. On the right, another employee is <b>sitting on a chair</b> and resting. There is a <b>round table with a cup</b> on it, and a plant on the left side. The atmosphere looks <b>relaxed and friendly</b>.",
+  tip:"두 사람이 마주 보면 무조건 'talking to each other' — 대화 장면으로 만들기."},
+ {scene:{bg:'park',items:[['prop','tree',100,1.2],['p',230,'sit',2,3],['prop','bench',390],['p',432,'sit',5,0],['p',540,'walk',1,1,1]]},
+  model:"This picture shows a <b>park on a nice day</b>. In the middle, a woman is <b>sitting on the grass</b> under a big tree, enjoying the sunshine. On the right, a man is <b>sitting on a bench</b>, and another person is <b>walking</b> past him. The park is <b>full of green trees</b>, and the sky is clear. Everyone seems to be <b>enjoying their free time</b> outside. I'd love to visit a park like this on weekends.",
+  tip:"마지막에 '나라면 ~하고 싶다' 한 줄은 시간이 남을 때 쓰는 마무리 카드."},
+],
+q57:{intro:"Imagine that a radio station is preparing a program about music. You have agreed to participate in a telephone interview about listening to music.",
+ qs:[
+  {t:15,q:"When do you usually listen to music, and how do you listen to it?",
+   model:"I usually listen to music <b>on my way to work</b>, and I listen to it <b>on my smartphone with earphones</b>, using a streaming app."},
+  {t:15,q:"What kind of music do you listen to when you feel stressed?",
+   model:"When I feel stressed, I listen to <b>calm piano music</b> because it helps me <b>relax and clear my mind</b>."},
+  {t:30,q:"Do you think listening to music while working helps people concentrate? Why or why not?",
+   model:"Yes, I think music <b>can help people concentrate</b>, but it depends on the type. <b>Quiet music without lyrics</b>, like piano or jazz, blocks out noise and helps me focus. <b>For example</b>, when I work in a noisy office, I put on instrumental music, and I can concentrate much better. <b>However</b>, songs with strong lyrics can be distracting, so choosing the right music is important."},
+ ]},
+q810:{head:"Grandstage Theater — October Performance Schedule",sub:"Box Office: 555-0132 · Online booking available",
+ rows:[["Oct 3 – 4, 7:30 p.m.","Musical: City Lights","Tickets $45"],
+  ["Oct 10, 8:00 p.m.","Jazz Night with the Blue Notes","Tickets $30"],
+  ["Oct 17 – 18, 7:00 p.m.","Play: The Last Train","Tickets $35"],
+  ["Oct 24, 6:00 p.m.","Family Magic Show","Tickets $20, children free"],
+  ["Oct 31, 8:00 p.m.","Halloween Rock Concert","Sold out"]],
+ foot:"Members receive 10% off all tickets except sold-out shows",
+ caller:"Hello, this is Monica Reyes. I'm thinking about visiting your theater this month with my family, but I don't have the schedule in front of me. Can I ask you some questions?",
+ qs:[
+  {t:15,q:"What time does the family magic show start, and how much are the tickets?",
+   model:"The family magic show starts at <b>six p.m. on October twenty-fourth</b>. Tickets are <b>twenty dollars</b>, and <b>children get in free</b>."},
+  {t:15,q:"I'd like to see the Halloween Rock Concert on the thirty-first. Can I still buy tickets?",
+   model:"I'm sorry, but the Halloween Rock Concert is <b>completely sold out</b>, so tickets are no longer available for that show."},
+  {t:30,q:"I'm free on the weekends in the first half of the month. Could you tell me about all the performances before October 15th?",
+   model:"Sure. There are <b>two performances</b> in the first half of October. <b>First</b>, the musical <b>'City Lights'</b> will be performed on <b>October third and fourth at seven thirty p.m.</b>, and tickets are <b>forty-five dollars</b>. <b>Then</b>, on <b>October tenth at eight p.m.</b>, there's <b>Jazz Night with the Blue Notes</b>, and tickets cost <b>thirty dollars</b>."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'Companies should provide regular training programs for their employees.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>strongly agree</b> that companies should provide regular training programs. There are two reasons. <b>First</b>, training improves employees' skills, which <b>directly benefits the company</b>. The business world changes quickly, so workers need to keep learning new tools and trends. <b>Second</b>, training programs increase employee satisfaction. <b>For example</b>, my company offers free online courses, and thanks to them, I learned new data skills and got <b>more interesting projects</b>. This made me want to stay at the company longer. Training costs money in the short term, but in the long run, it creates <b>skilled and loyal employees</b>. Therefore, I believe regular training is a smart investment for every company.",
+ note:"'in the short term ~ in the long run' 대비 구문 — 비용 관련 주제 만능 표현."},
+},
+/* ============ SET 8 ============ */
+{
+theme:"외식·마트·대학강좌",
+q12:[
+ {guide:"*Good* evening, / and *welcome* to the grand opening / of *Lakeside* Shopping Plaza! / To celebrate, / the *first* one hundred customers / will receive a *free* gift bag. / Don't miss our *special* performances / on the *main* stage / at *seven* o'clock. / Thank you for *joining* us, / and enjoy the *celebration*!",
+  tip:"개점 행사 멘트 — 축제 분위기의 하이톤. first one hundred 숫자 강세."},
+ {guide:"You're listening to '*Morning* Talk' / on Radio *Five*. / Coming up *next*, / we'll speak with *chef* Laura Benson / about her *new* cookbook, / '*Simple* Meals for Busy People.' / After that, / we'll take *your* calls / and share *listeners'* favorite recipes. / *Stay* tuned — / we'll be *right* back after this break.",
+  tip:"라디오 진행 톤. Stay tuned 앞에서 호흡 끊고 리듬 변화 주기."},
+],
+q34:[
+ {scene:{bg:'store',items:[['p',270,'stand',3,1],['prop','counter',210,150],['p',100,'cart',0,2],['prop','cart',128],['prop','shelf',450],['p',520,'hold',6,0,1]]},
+  model:"This picture was taken at a <b>supermarket</b>. In the middle, a cashier is <b>standing behind the checkout counter</b>. On the left, a customer is <b>pushing a shopping cart</b> toward the counter to pay. On the right, a woman is <b>looking at a product</b> in front of a shelf full of items. It seems like <b>an ordinary day</b> at the store, and the customers are <b>doing their weekly grocery shopping</b>.",
+  tip:"계산대 장면: cashier, checkout counter, pay for ~ 세트로 외우기."},
+ {scene:{bg:'office',items:[['p',85,'type',2,0],['prop','desk',105,100],['prop','laptop',130],['p',280,'type',5,3],['prop','desk',300,100],['prop','laptop',325],['p',490,'present',1,1,1],['prop','plant',545]]},
+  model:"This is a picture of a <b>coworking space</b>. Two people are <b>sitting at desks and working on their laptops</b>. On the right, a man is <b>standing and raising his hand</b> while talking, so he might be <b>explaining something</b> to the others. There are windows and a plant in the background, which makes the space feel <b>open and modern</b>. Everyone seems <b>busy but comfortable</b>.",
+  tip:"같은 office 배경이라도 '요즘 코워킹 스페이스'처럼 명명하면 어휘 점수 상승."},
+],
+q57:{intro:"Imagine that a restaurant chain is doing a survey in your city. You have agreed to answer some questions about eating out.",
+ qs:[
+  {t:15,q:"How often do you eat out, and who do you usually eat out with?",
+   model:"I eat out <b>about twice a week</b>, usually <b>with my family or close friends</b> on weekends."},
+  {t:15,q:"What kind of restaurant did you visit most recently?",
+   model:"Most recently, I visited <b>a Korean barbecue restaurant</b> near my office. The food was great, and the price was <b>reasonable</b>."},
+  {t:30,q:"When choosing a restaurant, do you rely on online reviews? Why or why not?",
+   model:"Yes, I <b>always check online reviews</b> before choosing a restaurant. <b>The main reason</b> is that reviews help me avoid disappointment. Photos and comments from real customers show <b>what the food actually looks like</b>. <b>For example</b>, last month I found a great pasta place through reviews, and it was even better than I expected. Of course, some reviews are fake, so I usually check <b>several sources</b>, not just one."},
+ ]},
+q810:{head:"Westfield University — Evening Courses for Adults",sub:"Spring Semester · Classes begin April 6",
+ rows:[["Mon & Wed 6:30 p.m.","Business English","Prof. Karen Wells · 8 weeks · $180"],
+  ["Tue 7:00 p.m.","Introduction to Marketing","Prof. Steve Doyle · 10 weeks · $200"],
+  ["Wed 7:30 p.m.","Public Speaking","Prof. Rita Gomez · 6 weeks · $150"],
+  ["Thu 6:00 p.m.","Data Analysis Basics","Prof. Henry Cho · 12 weeks · $250"],
+  ["Fri 6:30 p.m.","Digital Photography","Prof. Amy Ford · 8 weeks · $170"]],
+ foot:"Register online · Early-bird discount: 10% off before March 20",
+ caller:"Hi, my name is Jason Lim. I'm interested in taking an evening course at your university this spring, but I have a few questions about the schedule.",
+ qs:[
+  {t:15,q:"When do the classes begin, and is there any discount available?",
+   model:"Classes begin on <b>April sixth</b>, and there's an <b>early-bird discount</b> — you get <b>ten percent off</b> if you register before <b>March twentieth</b>."},
+  {t:15,q:"The Public Speaking course runs for ten weeks, right?",
+   model:"Actually, that's <b>not quite right</b>. The Public Speaking course runs for <b>six weeks</b>, not ten. It meets on <b>Wednesdays at seven thirty</b> and costs a hundred and fifty dollars."},
+  {t:30,q:"I want to improve my business skills. Could you tell me about all the courses related to business or communication?",
+   model:"Certainly. There are <b>three courses</b> you might like. <b>Business English</b> with Professor Karen Wells meets <b>Mondays and Wednesdays at six thirty</b> for eight weeks, at a hundred eighty dollars. <b>Introduction to Marketing</b> is on <b>Tuesdays at seven</b>, running ten weeks for two hundred dollars. And <b>Public Speaking</b> is on <b>Wednesdays at seven thirty</b>, six weeks for a hundred fifty dollars."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'It is better to buy things online than in physical stores.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>agree</b> that buying things online is better than shopping in physical stores. I have two reasons. <b>First</b>, online shopping saves a lot of time. I don't need to travel to the store, wait in line, or carry heavy bags — everything is <b>delivered to my door</b>, sometimes on the same day. <b>Second</b>, it's easier to find the best price online. <b>For example</b>, when I bought a laptop last year, I compared prices on three websites in ten minutes and <b>saved about a hundred dollars</b>. Some people worry that they can't see products before buying, but detailed reviews and photos <b>solve most of that problem</b>. Therefore, I prefer shopping online.",
+ note:"쇼핑·기술 주제는 자기 경험 숫자(백 달러 아꼈다)를 넣으면 설득력이 확 산다."},
+},
+/* ============ SET 9 ============ */
+{
+theme:"휴가·도서관·피트니스",
+q12:[
+ {guide:"*Good* evening, ladies and gentlemen, / and *thank* you for joining / tonight's *charity* dinner. / All *proceeds* from this event / will support the *children's* hospital / here in our *community*. / Later this evening, / we'll hold a *silent* auction / featuring items donated by *local* businesses. / Please *enjoy* the dinner, / and thank you for your *generosity*.",
+  tip:"자선 행사 톤 — 정중하고 따뜻하게. proceeds, generosity 발음 체크."},
+ {guide:"Is your *old* laptop slowing you down? / Come to *Tech World's* summer sale! / This week *only*, / save up to *forty* percent / on *laptops*, / *tablets*, / and *wireless* accessories. / Our *experts* are ready / to help you find / the *perfect* device. / Hurry in — / these deals *won't* last long!",
+  tip:"전자제품 광고. won't의 부정 강세, Hurry in의 긴박한 리듬."},
+],
+q34:[
+ {scene:{bg:'library',items:[['prop','bookshelf',30],['p',250,'sit',4,0],['prop','chair',228,-1],['p',350,'sit',0,2],['prop','desk',240,200],['prop','laptop',300],['p',520,'read',6,1,1]]},
+  model:"This is a picture of a <b>library study area</b>. In the middle, two students are <b>sitting at a long desk</b>, and one of them is <b>using a laptop</b>. On the right, a man is <b>standing and reading a book</b> he just took from the shelf. On the left, there is a <b>tall bookshelf full of books</b>. The room looks <b>quiet and calm</b>, so it seems like a <b>good place to concentrate</b>.",
+  tip:"두 명 이상 앉아 있으면 'one of them is ~ing'으로 개별 동작 추가."},
+ {scene:{bg:'park',items:[['prop','foodtruck',40],['p',330,'stand',2,0,1],['p',400,'stand',5,3,1],['p',480,'hold',0,1,1]]},
+  model:"This picture shows a <b>food truck in a park</b>. On the left, there is a <b>red food truck</b> with a large service window. Three people are <b>standing in line</b> in front of the truck, waiting to order. The person at the back is already <b>holding a drink</b>. The weather looks <b>sunny and warm</b>. It seems like <b>lunchtime</b>, and the food truck looks <b>quite popular</b>.",
+  tip:"줄 선 사람 수 세기(three people) — 숫자 언급은 관찰력 점수."},
+],
+q57:{intro:"Imagine that a travel magazine is doing research about vacations. You have agreed to participate in a telephone interview about holidays and vacations.",
+ qs:[
+  {t:15,q:"How many days of vacation do you usually take per year, and when do you prefer to take them?",
+   model:"I usually take <b>about ten days</b> of vacation per year, and I prefer to use them <b>in summer</b>, especially in August."},
+  {t:15,q:"What do you usually do during your vacation?",
+   model:"During my vacation, I usually <b>travel to the beach</b> or just <b>stay home and rest</b>, watching movies and catching up on sleep."},
+  {t:30,q:"Do you think it is important for workers to take regular vacations? Why?",
+   model:"Yes, I think regular vacations are <b>very important</b> for workers. <b>First</b>, rest prevents burnout. Working non-stop makes people tired and less productive, but after a vacation, they come back <b>with new energy</b>. <b>For example</b>, after my summer trip last year, I felt refreshed and finished my projects much faster. <b>Also</b>, vacations give people time with their families, which makes them <b>happier at work</b> too."},
+ ]},
+q810:{head:"Peak Fitness Center — Weekly Group Class Timetable",sub:"All classes included with membership · Towels provided",
+ rows:[["Mon 7:00 a.m.","Morning Spinning","45 min · Studio 1"],
+  ["Tue 6:30 p.m.","Beginner Pilates","50 min · Studio 2"],
+  ["Wed 7:00 p.m.","Boxing Fit","60 min · Studio 1"],
+  ["Thu 6:30 p.m.","Power Yoga","50 min · Studio 3"],
+  ["Sat 10:00 a.m.","Family Zumba","45 min · Main Hall"],
+  ["Sun 10:00 a.m.","Stretch & Relax","40 min · Studio 2"]],
+ foot:"Reserve classes through the mobile app up to 3 days in advance",
+ caller:"Hello, this is Kate Wilson. I just became a member of your fitness center, but I haven't received the class timetable yet. Could you answer some questions for me?",
+ qs:[
+  {t:15,q:"What class is offered on Saturday morning, and where does it take place?",
+   model:"On Saturday at <b>ten a.m.</b>, there's a <b>Family Zumba</b> class, and it takes place in the <b>Main Hall</b>. It lasts forty-five minutes."},
+  {t:15,q:"Do I need to pay extra for the group classes?",
+   model:"No, you don't. <b>All group classes are included</b> with your membership at no extra charge, and <b>towels are provided</b> as well."},
+  {t:30,q:"I can only work out on weekday evenings. Could you tell me all the classes I can join?",
+   model:"Of course. There are <b>three evening classes</b> on weekdays. On <b>Tuesdays at six thirty</b>, there's <b>Beginner Pilates</b> in Studio two, which lasts fifty minutes. On <b>Wednesdays at seven</b>, you can join <b>Boxing Fit</b> in Studio one for sixty minutes. And on <b>Thursdays at six thirty</b>, there's <b>Power Yoga</b> in Studio three, also fifty minutes."},
+ ]},
+q11:{q:"Which do you prefer: taking one long vacation per year, or several short vacations throughout the year? Give specific reasons or examples to support your opinion.",
+ model:"I prefer taking <b>several short vacations</b> throughout the year. There are two reasons. <b>First</b>, short breaks help me manage stress regularly. If I take only one vacation a year, I get <b>exhausted waiting for it</b>, but a short trip every few months keeps me refreshed. <b>Second</b>, short vacations are easier to plan. <b>For example</b>, last year I took three weekend trips to nearby cities, and each one was cheap and simple to organize — no long flights and no heavy planning. A long vacation sounds nice, but coming back to <b>a mountain of work</b> after two weeks away is very stressful. <b>For these reasons</b>, several short vacations work better for me.",
+ note:"'a mountain of work' 같은 관용 표현 1개 = 어휘 다양성 점수."},
+},
+/* ============ SET 10 ============ */
+{
+theme:"독서·발표·재택",
+q12:[
+ {guide:"*Attention*, passengers. / The *express* train to *Central* Station / will arrive / on platform *three* / in approximately *five* minutes. / Due to *crowded* conditions, / please stand *behind* the yellow line / and let passengers *exit* first / before boarding. / Thank you for your *cooperation*, / and have a *pleasant* journey.",
+  tip:"역 안내방송. behind the yellow line 안전 문구는 또렷하게."},
+ {guide:"*Spring* is finally here, / and it's the *perfect* time / to start your own *garden*! / On today's show, / we'll learn how to grow *tomatoes*, / *herbs*, / and *flowers* / right on your *balcony*. / Whether you're a *beginner* / or an *experienced* gardener, / you'll find *plenty* of useful tips. / Let's *dig* in!",
+  tip:"Whether A or B 구문 리듬 + Let's dig in! 마무리는 경쾌하게."},
+],
+q34:[
+ {scene:{bg:'meeting',items:[['prop','screen',400],['prop','chair',70,-1],['p',110,'sit',5,1],['prop','chair',160,-1],['p',200,'sit',2,0],['p',330,'present',0,3]]},
+  model:"This is a picture of a <b>presentation in a conference room</b>. On the right, a woman is <b>standing in front of a large screen</b> and pointing at it while she speaks. Two people are <b>sitting on chairs</b> and listening to her carefully. The screen shows <b>some text and a chart</b>. Judging from their postures, the audience seems <b>very interested</b> in the presentation. It might be <b>a team meeting about a new plan</b>.",
+  tip:"'Judging from ~' 고급 추측 표현 — AL 어휘 카드로 챙겨두기."},
+ {scene:{bg:'cafe',items:[['p',95,'type',4,2],['prop','table',115],['prop','laptop',140],['p',335,'type',7,0],['prop','table',355],['prop','laptop',380],['p',530,'stand',1,1,1],['prop','counter',470,130]]},
+  model:"This picture shows people <b>working at a café</b>. Two customers are <b>sitting at separate tables, typing on their laptops</b>. They might be <b>remote workers or students</b>. On the right, a staff member is <b>standing behind the counter</b>. In the background, there is a menu board on the wall. The café looks <b>quiet and comfortable</b>, so it seems like a <b>popular place for working</b>.",
+  tip:"카페+노트북 = remote workers 추측. 요즘 시험이 좋아하는 장면."},
+],
+q57:{intro:"Imagine that a publishing company is doing research about reading habits. You have agreed to participate in a telephone survey about reading books.",
+ qs:[
+  {t:15,q:"How often do you read books, and what kind of books do you enjoy?",
+   model:"I read books <b>two or three times a week</b>, mostly before bed, and I enjoy <b>self-development books and novels</b>."},
+  {t:15,q:"Do you prefer paper books or e-books? Why?",
+   model:"I prefer <b>e-books</b> because I can carry <b>hundreds of books on my phone</b> and read them anywhere, even on a crowded subway."},
+  {t:30,q:"Do you think children today read fewer books than in the past? Why do you think that is?",
+   model:"Yes, I think children today read <b>much less</b> than before, and <b>the biggest reason is smartphones</b>. Kids can watch short videos and play games anytime, and these are <b>more exciting than books</b>. <b>For example</b>, my little cousin watches YouTube for hours but never opens a book unless it's homework. <b>To change this</b>, I think parents need to read together with their children and limit screen time."},
+ ]},
+q810:{head:"TechBridge Workshop — Working From Home Effectively",sub:"Thursday, May 21 · Online via TechBridge Live",
+ rows:[["10:00 – 10:15","Welcome & Platform Guide","Host: Nora Evans"],
+  ["10:15 – 11:15","Session 1: Setting Up Your Home Office","Ergonomics expert Jill Moore"],
+  ["11:15 – 12:15","Session 2: Staying Focused at Home","Dr. Peter Shaw"],
+  ["12:15 – 1:15","Lunch Break",""],
+  ["1:15 – 2:15","Session 3: Online Communication Tools","IT trainer Max Grant"],
+  ["2:15 – 2:45","Live Q&A with All Speakers",""]],
+ foot:"Free for TechBridge members · Non-members: $15 · Recording sent to all attendees",
+ caller:"Hi, this is Emily Choi. I registered for the online workshop about working from home, but I can't log in to see the agenda. Do you mind if I ask a few questions?",
+ qs:[
+  {t:15,q:"What time does the workshop start, and is there a fee for members?",
+   model:"The workshop starts at <b>ten a.m.</b> with a welcome session, and it's <b>completely free for TechBridge members</b>. Non-members pay fifteen dollars."},
+  {t:15,q:"I might miss some sessions in the afternoon. Is there any way to watch them later?",
+   model:"Yes, there is. A <b>recording of the workshop</b> will be <b>sent to all attendees</b> after the event, so you can watch any sessions you miss."},
+  {t:30,q:"Could you give me all the details about the sessions before the lunch break?",
+   model:"Sure. There are <b>two main sessions</b> in the morning. <b>First</b>, from <b>ten fifteen to eleven fifteen</b>, ergonomics expert Jill Moore will present <b>'Setting Up Your Home Office.'</b> <b>Right after that</b>, from <b>eleven fifteen to twelve fifteen</b>, Dr. Peter Shaw will lead a session called <b>'Staying Focused at Home.'</b> The lunch break follows at twelve fifteen."},
+ ]},
+q11:{q:"Do you agree or disagree with the following statement? 'Employees work more effectively from home than in an office.' Give specific reasons or examples to support your opinion.",
+ model:"I <b>agree</b> that employees work more effectively from home. There are two reasons. <b>First</b>, working from home saves commuting time. In big cities, people often spend <b>two hours a day</b> on crowded buses or subways, but remote workers can use that time <b>to work or rest</b>. <b>Second</b>, home offices have fewer interruptions. <b>For example</b>, when I work from home, nobody stops by my desk to chat, so I can <b>finish my tasks much faster</b> than at the office. Some people say teamwork suffers at home, but video calls and messenger apps <b>solve most communication problems</b>. <b>Therefore</b>, I believe working from home makes employees more, not less, effective.",
+ note:"첫 진단 때 풀었던 그 주제 — 나중에 첫 답변과 비교해보면 성장이 보인다."},
+}
+]
+;
+/* ================= scene renderer ================= */
+const CLOTH=['#3E6B8C','#B0554B','#5B8C5A','#8C6D3E','#7A5C8C','#4B8C86','#C77F3B','#5D5F7E'];
+const SKIN=['#E8B58F','#C68863','#8D5B3F','#F0C9A5'];
+const PANTS='#39434D', HAIR='#3A2E28';
+function person(x,pose,ci,si,flip){
+  const c=CLOTH[ci%CLOTH.length], s=SKIN[si%SKIN.length], f=flip?-1:1;
+  let inner='';
+  const head=(hy)=>`<circle cx="0" cy="${hy}" r="13" fill="${s}"/><path d="M -13 ${hy-3} A 13 13 0 0 1 13 ${hy-3} L 13 ${hy-7} A 13 13 0 0 0 -13 ${hy-7} Z" fill="${HAIR}"/>`;
+  if(pose==='sit'||pose==='type'){
+    inner+=`<rect x="-16" y="-92" width="30" height="50" rx="9" fill="${c}"/>`+head(-105);
+    inner+=`<rect x="-14" y="-50" width="34" height="12" rx="5" fill="${PANTS}"/><rect x="14" y="-42" width="9" height="42" rx="4" fill="${PANTS}"/>`;
+    if(pose==='type'){inner+=`<rect x="8" y="-80" width="30" height="8" rx="4" fill="${c}" opacity=".85"/><circle cx="38" cy="-76" r="5" fill="${s}"/>`;}
+    else{inner+=`<rect x="10" y="-86" width="8" height="32" rx="4" fill="${c}" opacity=".85"/><circle cx="14" cy="-52" r="5" fill="${s}"/>`;}
+  }else{
+    inner+=head(-98)+`<rect x="-15" y="-88" width="30" height="52" rx="9" fill="${c}"/>`;
+    if(pose==='walk'){
+      inner+=`<rect x="-13" y="-40" width="9" height="42" rx="4" fill="${PANTS}" transform="rotate(-12 -8 -40)"/><rect x="4" y="-40" width="9" height="42" rx="4" fill="${PANTS}" transform="rotate(12 8 -40)"/>`;
+      inner+=`<rect x="-22" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85" transform="rotate(10 -18 -84)"/><rect x="15" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85" transform="rotate(-10 18 -84)"/>`;
+    }else{
+      inner+=`<rect x="-11" y="-40" width="9" height="40" rx="4" fill="${PANTS}"/><rect x="2" y="-40" width="9" height="40" rx="4" fill="${PANTS}"/>`;
+      if(pose==='hold'){
+        inner+=`<rect x="-22" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85"/><circle cx="-18" cy="-46" r="5" fill="${s}"/>`;
+        inner+=`<rect x="15" y="-84" width="7" height="20" rx="3.5" fill="${c}" opacity=".85"/><rect x="15" y="-70" width="16" height="7" rx="3.5" fill="${c}" opacity=".85"/><circle cx="32" cy="-67" r="5" fill="${s}"/><rect x="27" y="-80" width="11" height="13" rx="2" fill="#fff" stroke="#B9C2BC"/>`;
+      }else if(pose==='present'){
+        inner+=`<rect x="-22" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85"/><circle cx="-18" cy="-46" r="5" fill="${s}"/>`;
+        inner+=`<rect x="14" y="-112" width="7" height="34" rx="3.5" fill="${c}" opacity=".85" transform="rotate(35 17 -80)"/><circle cx="36" cy="-106" r="5" fill="${s}"/>`;
+      }else if(pose==='carry'){
+        inner+=`<rect x="-20" y="-82" width="7" height="26" rx="3.5" fill="${c}" opacity=".85" transform="rotate(-30 -17 -82)"/><rect x="13" y="-82" width="7" height="26" rx="3.5" fill="${c}" opacity=".85" transform="rotate(30 17 -82)"/>`;
+        inner+=`<rect x="4" y="-90" width="34" height="26" rx="3" fill="#C9A36B" stroke="#A87F44"/>`;
+      }else if(pose==='read'){
+        inner+=`<rect x="-20" y="-82" width="7" height="24" rx="3.5" fill="${c}" opacity=".85" transform="rotate(-40 -17 -82)"/><rect x="13" y="-82" width="7" height="24" rx="3.5" fill="${c}" opacity=".85" transform="rotate(40 17 -82)"/>`;
+        inner+=`<rect x="-12" y="-78" width="24" height="17" rx="2" fill="#fff" stroke="#B9C2BC"/><line x1="0" y1="-78" x2="0" y2="-61" stroke="#B9C2BC"/>`;
+      }else if(pose==='cart'){
+        inner+=`<rect x="14" y="-80" width="24" height="7" rx="3.5" fill="${c}" opacity=".85"/><circle cx="40" cy="-76" r="5" fill="${s}"/>`;
+        inner+=`<rect x="-22" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85"/><circle cx="-18" cy="-46" r="5" fill="${s}"/>`;
+      }else{ /* stand */
+        inner+=`<rect x="-22" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85"/><rect x="15" y="-84" width="7" height="36" rx="3.5" fill="${c}" opacity=".85"/><circle cx="-18" cy="-46" r="5" fill="${s}"/><circle cx="18" cy="-46" r="5" fill="${s}"/>`;
+      }
+    }
+  }
+  return `<g transform="translate(${x},330) scale(${f},1)">${inner}</g>`;
+}
+const PROPS={
+  desk:(x,w=110)=>`<g transform="translate(${x},330)"><rect x="0" y="-72" width="${w}" height="9" rx="3" fill="#8C6B4A"/><rect x="4" y="-63" width="8" height="63" fill="#75573B"/><rect x="${w-12}" y="-63" width="8" height="63" fill="#75573B"/></g>`,
+  laptop:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-90" width="26" height="17" rx="2" fill="#4A5560"/><rect x="-2" y="-73" width="30" height="4" rx="2" fill="#5D6974"/></g>`,
+  chair:(x,f=1)=>`<g transform="translate(${x},330) scale(${f},1)"><rect x="-4" y="-50" width="36" height="8" rx="3" fill="#5D6974"/><rect x="-4" y="-92" width="8" height="46" rx="3" fill="#5D6974"/><rect x="8" y="-42" width="7" height="42" fill="#4A5560"/><rect x="20" y="-42" width="7" height="42" fill="#4A5560"/></g>`,
+  table:(x)=>`<g transform="translate(${x},330)"><ellipse cx="40" cy="-70" rx="46" ry="8" fill="#8C6B4A"/><rect x="35" y="-68" width="10" height="68" fill="#75573B"/></g>`,
+  cuptable:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-84" width="9" height="13" rx="2" fill="#fff" stroke="#B9C2BC"/></g>`,
+  counter:(x,w=150)=>`<g transform="translate(${x},330)"><rect x="0" y="-95" width="${w}" height="95" fill="#75573B"/><rect x="-4" y="-102" width="${w+8}" height="10" rx="3" fill="#8C6B4A"/></g>`,
+  shelf:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-190" width="90" height="190" fill="#B9A588"/><rect x="6" y="-180" width="78" height="8" fill="#8C7757"/><rect x="6" y="-130" width="78" height="8" fill="#8C7757"/><rect x="6" y="-80" width="78" height="8" fill="#8C7757"/>${[0,1,2].map(r=>[0,1,2,3].map(i=>`<rect x="${12+i*19}" y="${-172+r*50}" width="13" height="16" rx="2" fill="${['#C96F5E','#6FA3C9','#8FBF7F','#D9B25F'][(i+r)%4]}"/>`).join('')).join('')}</g>`,
+  bookshelf:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-210" width="80" height="210" fill="#8C6B4A"/>${[0,1,2,3].map(r=>`<rect x="6" y="${-198+r*50}" width="68" height="6" fill="#75573B"/>`).join('')}${[0,1,2,3].map(r=>[0,1,2,3,4].map(i=>`<rect x="${9+i*13}" y="${-192+r*50}" width="9" height="38" fill="${['#A85E52','#5E7CA8','#6E9963','#C2A05A','#7A6B99'][(i+r)%5]}"/>`).join('')).join('')}</g>`,
+  tree:(x,s=1)=>`<g transform="translate(${x},330) scale(${s})"><rect x="-8" y="-70" width="16" height="70" fill="#75573B"/><circle cx="0" cy="-105" r="48" fill="#7FA86B"/><circle cx="-32" cy="-85" r="30" fill="#8FB87A"/><circle cx="30" cy="-88" r="32" fill="#6E9963"/></g>`,
+  bench:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-46" width="90" height="9" rx="3" fill="#8C6B4A"/><rect x="0" y="-70" width="90" height="8" rx="3" fill="#8C6B4A"/><rect x="6" y="-38" width="8" height="38" fill="#75573B"/><rect x="76" y="-38" width="8" height="38" fill="#75573B"/></g>`,
+  board:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-200" width="110" height="80" rx="4" fill="#3E4A44"/><rect x="8" y="-192" width="60" height="7" rx="3" fill="#E8E4D8"/><rect x="8" y="-178" width="90" height="5" rx="2" fill="#B9C2A8"/><rect x="8" y="-166" width="80" height="5" rx="2" fill="#B9C2A8"/><rect x="8" y="-154" width="86" height="5" rx="2" fill="#B9C2A8"/><rect x="48" y="-120" width="12" height="120" fill="#4A5560"/></g>`,
+  screen:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-230" width="150" height="95" rx="4" fill="#fff" stroke="#9AA5A0" stroke-width="3"/><rect x="14" y="-216" width="70" height="9" rx="3" fill="#4B8C86"/><rect x="14" y="-196" width="120" height="6" rx="2" fill="#C4CCC7"/><rect x="14" y="-182" width="110" height="6" rx="2" fill="#C4CCC7"/><rect x="14" y="-168" width="118" height="6" rx="2" fill="#C4CCC7"/></g>`,
+  plant:(x)=>`<g transform="translate(${x},330)"><path d="M 0 0 L 26 0 L 22 -34 L 4 -34 Z" fill="#B0554B"/><circle cx="13" cy="-52" r="20" fill="#6E9963"/><circle cx="2" cy="-42" r="13" fill="#7FA86B"/><circle cx="25" cy="-44" r="13" fill="#8FB87A"/></g>`,
+  cart:(x,f=1)=>`<g transform="translate(${x},330) scale(${f},1)"><path d="M 0 -78 L 6 -78 L 14 -30 L 52 -30 L 58 -64 L 10 -64" fill="none" stroke="#7A8590" stroke-width="5" stroke-linejoin="round"/><circle cx="20" cy="-14" r="8" fill="#4A5560"/><circle cx="46" cy="-14" r="8" fill="#4A5560"/></g>`,
+  suitcase:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-64" width="34" height="52" rx="5" fill="#5D5F7E"/><rect x="14" y="-104" width="6" height="40" fill="#7A8590"/><circle cx="6" cy="-8" r="5" fill="#39434D"/><circle cx="28" cy="-8" r="5" fill="#39434D"/></g>`,
+  fruitstand:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-70" width="120" height="70" fill="#8C6B4A"/><rect x="-5" y="-78" width="130" height="10" rx="3" fill="#75573B"/>${[0,1,2,3,4,5,6,7].map(i=>`<circle cx="${14+ (i%4)*30}" cy="${-92+Math.floor(i/4)*0}" r="9" fill="${i%4<2?'#C96F5E':'#D9B25F'}"/>`).join('')}${[0,1,2,3].map(i=>`<circle cx="${20+i*28}" cy="-106" r="9" fill="#8FBF7F"/>`).join('')}</g>`,
+  treadmill:(x,f=1)=>`<g transform="translate(${x},330) scale(${f},1)"><rect x="0" y="-14" width="90" height="12" rx="6" fill="#4A5560"/><rect x="78" y="-110" width="8" height="100" fill="#5D6974" transform="rotate(14 82 -10)"/><rect x="60" y="-112" width="40" height="9" rx="4" fill="#4A5560"/></g>`,
+  crosswalk:()=>[0,1,2,3,4].map(i=>`<rect x="${140+i*70}" y="340" width="40" height="34" fill="#E8E4D8" opacity=".85"/>`).join(''),
+  foodtruck:(x)=>`<g transform="translate(${x},330)"><rect x="0" y="-130" width="180" height="118" rx="8" fill="#C96F5E"/><rect x="16" y="-108" width="90" height="46" fill="#FFF3E0" stroke="#A85E52"/><rect x="8" y="-142" width="164" height="14" rx="6" fill="#A85E52"/><circle cx="36" cy="0" r="14" fill="#39434D"/><circle cx="144" cy="0" r="14" fill="#39434D"/><text x="128" y="-80" font-size="15" fill="#FFF3E0" font-family="Georgia">FOOD</text></g>`,
+  window:(x,y=90,w=90,h=70)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="#CFE3EA" stroke="#B4C6CC" stroke-width="4"/>`,
+  clockp:(x)=>`<g transform="translate(${x},110)"><circle r="16" fill="#fff" stroke="#9AA5A0" stroke-width="3"/><line x1="0" y1="0" x2="0" y2="-9" stroke="#4A5560" stroke-width="2"/><line x1="0" y1="0" x2="7" y2="3" stroke="#4A5560" stroke-width="2"/></g>`,
+};
+const BGS={
+  office:()=>`<rect width="600" height="330" fill="#EDEAE2"/><rect y="330" width="600" height="50" fill="#C9C2B2"/>${PROPS.window(60)}${PROPS.window(260)}${PROPS.clockp(490)}`,
+  cafe:()=>`<rect width="600" height="330" fill="#F0E7DA"/><rect y="330" width="600" height="50" fill="#B8A488"/><rect x="380" y="70" width="180" height="90" rx="4" fill="#3E4A44"/><text x="410" y="105" font-size="20" fill="#E8E4D8" font-family="Georgia">MENU</text><rect x="400" y="120" width="140" height="5" fill="#B9C2A8"/><rect x="400" y="135" width="110" height="5" fill="#B9C2A8"/>`,
+  park:()=>`<rect width="600" height="330" fill="#D8E6EC"/><rect y="330" width="600" height="50" fill="#8FB87A"/><circle cx="500" cy="70" r="34" fill="#F2D479"/><path d="M 0 336 Q 300 320 600 336 L 600 352 Q 300 336 0 352 Z" fill="#C9BFa5"/>`,
+  store:()=>`<rect width="600" height="330" fill="#EAEFE8"/><rect y="330" width="600" height="50" fill="#C4CCC7"/>`,
+  library:()=>`<rect width="600" height="330" fill="#F0EBE0"/><rect y="330" width="600" height="50" fill="#B8A488"/>${PROPS.clockp(300)}`,
+  street:()=>`<rect width="600" height="330" fill="#D8E6EC"/><rect x="20" y="60" width="130" height="270" fill="#C9B8A8"/><rect x="180" y="100" width="110" height="230" fill="#B8C4C9"/><rect x="440" y="80" width="140" height="250" fill="#C4B4C9"/>${[0,1,2].map(r=>[0,1].map(i=>`<rect x="${45+i*50}" y="${85+r*70}" width="30" height="38" fill="#EDF3F5"/>`).join('')).join('')}<rect y="330" width="600" height="50" fill="#7A8590"/>`,
+  meeting:()=>`<rect width="600" height="330" fill="#E8ECEF"/><rect y="330" width="600" height="50" fill="#B4BCC2"/>${PROPS.window(420,80,120,80)}`,
+  gym:()=>`<rect width="600" height="330" fill="#E4E9ED"/><rect y="330" width="600" height="50" fill="#9AA5B0"/><rect x="40" y="80" width="200" height="110" rx="4" fill="#CFDDE4" stroke="#B4C6CC" stroke-width="4"/>`,
+  airport:()=>`<rect width="600" height="330" fill="#E6EDF2"/><rect y="330" width="600" height="50" fill="#B4BCC2"/><rect x="60" y="60" width="230" height="70" rx="6" fill="#22303A"/><text x="80" y="100" font-size="22" fill="#F2D479" font-family="ui-monospace,monospace">DEPARTURES</text><rect x="330" y="70" width="220" height="120" rx="4" fill="#CFE3EA" stroke="#B4C6CC" stroke-width="4"/>`,
+  kitchen:()=>`<rect width="600" height="330" fill="#F0EDE4"/><rect y="330" width="600" height="50" fill="#C9C2B2"/><rect x="40" y="70" width="220" height="60" rx="4" fill="#D8D2C2"/><rect x="60" y="140" width="60" height="24" fill="#9AA5A0"/><rect x="150" y="140" width="60" height="24" fill="#9AA5A0"/>`,
+};
+function renderScene(sc){
+  let out=`<svg viewBox="0 0 600 380" role="img" aria-label="장면 일러스트">`;
+  out+=BGS[sc.bg]();
+  for(const it of sc.items){
+    if(it[0]==='p') out+=person(it[1],it[2],it[3],it[4]||0,it[5]||0);
+    else out+=PROPS[it[1]].apply(null,it.slice(2));
+  }
+  return out+'</svg>';
+}
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const PARTS={
+  q12:{label:'Questions 1–2',title:'지문 읽기 (Read a text aloud)',dir:'화면의 지문을 소리 내어 읽으세요. 준비 45초, 답변 45초. <b>강세 단어</b>와 <span style="opacity:.7">/</span> 끊어읽기 표시를 참고하세요.'},
+  q34:{label:'Questions 3–4',title:'사진 묘사 (Describe a picture)',dir:'그림을 최대한 자세히 묘사하세요. 준비 45초, 답변 30초. 장소 → 중심 인물의 동작 → 주변 → 느낌 순서로.'},
+  q57:{label:'Questions 5–7',title:'질문 답변 (Respond to questions)',dir:'전화 설문에 답한다고 상상하세요. 질문이 음성으로 나오고, 준비 3초 후 바로 답변합니다 (15/15/30초).'},
+  q810:{label:'Questions 8–10',title:'표 보고 답변 (Respond using information)',dir:'자료를 45초간 확인한 후, 전화 문의에 표를 보며 답하세요. 준비 3초, 답변 15/15/30초. 실제 시험에서 질문은 음성으로만 나옵니다.'},
+  q11:{label:'Question 11',title:'의견 제시 (Express an opinion)',dir:'주제에 대한 의견과 이유를 말하세요. 준비 45초, 답변 60초. 입장 → 이유 1 + 예시 → 이유 2 → 마무리.'},
+};
+const CHECKS=['시간을 80% 이상 채웠다','완전한 문장으로 말했다','연결어·다양한 어휘를 썼다','발음·강세가 자연스러웠다','질문에 정확히 대응했다'];
+function fmtGuide(t){return t.replace(/\*(.+?)\*/g,'<b>$1</b>').replace(/ \/ /g,' <span class="pa">/</span> ');}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function todayStr(d){const x=d||new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+/* beep */
+let AC=null;
+function beep(freq,dur){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=freq;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.12,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);o.start();o.stop(AC.currentTime+dur);}catch(e){}}
+/* tts */
+let voiceEn=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();voiceEn=vs.find(v=>/en[-_]US/i.test(v.lang)&&/google/i.test(v.name))||vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function say(text,cb){
+  if(!('speechSynthesis' in window)){cb&&cb();return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  if(voiceEn)u.voice=voiceEn; u.lang='en-US'; u.rate=.95;
+  let done=false; const fin=()=>{if(!done){done=true;cb&&cb();}};
+  u.onend=fin; u.onerror=fin;
+  setTimeout(fin, 1200+text.length*90);
+  speechSynthesis.speak(u);
+}
+/* ================= storage ================= */
+const KEY='tosal_hist';
+function getHist(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){return[];}}
+function pushHist(h){const a=getHist();a.push(h);localStorage.setItem(KEY,JSON.stringify(a));}
+/* ================= home ================= */
+function renderHome(){
+  const target=new Date(2026,11,31), now=new Date();
+  const dd=Math.max(0,Math.ceil((target-now)/86400000));
+  $('dday').textContent='D-'+dd;
+  const hist=getHist();
+  $('totalCnt').textContent=hist.length;
+  const days=new Set(hist.map(h=>h.d));
+  let st=0,cur=new Date();
+  if(!days.has(todayStr(cur)))cur.setDate(cur.getDate()-1);
+  while(days.has(todayStr(cur))){st++;cur.setDate(cur.getDate()-1);}
+  $('streak').textContent=st;
+  const g=$('grass');g.innerHTML='';
+  const cnt={};hist.forEach(h=>cnt[h.d]=(cnt[h.d]||0)+1);
+  for(let i=69;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const c=cnt[todayStr(d)]||0;
+    const cell=document.createElement('i');if(c>=3)cell.className='l3';else if(c===2)cell.className='l2';else if(c===1)cell.className='l1';g.appendChild(cell);}
+  const hl=$('histList');
+  if(hist.length){hl.innerHTML=hist.slice(-6).reverse().map(h=>`<div class="hist-item"><span>${h.d} · ${esc(h.label)}</span><span class="sc">${h.score}%</span></div>`).join('');}
+  const opts=SETS.map((s,i)=>`<option value="${i}">Set ${i+1} — ${esc(s.theme)}</option>`).join('');
+  $('fullSet').innerHTML=opts;$('partSet').innerHTML=opts;
+  const done={};hist.forEach(h=>{if(h.mode==='full')done[h.set]=1;});
+}
+let selPart='q57';
+function renderPartGrid(){
+  const names={q12:'지문 읽기',q34:'사진 묘사',q57:'질문 답변',q810:'표 답변',q11:'의견 제시'};
+  const shorts={q12:'Q1–2',q34:'Q3–4',q57:'Q5–7',q810:'Q8–10',q11:'Q11'};
+  $('partGrid').innerHTML=Object.keys(names).map(k=>
+    `<button class="part-btn${k===selPart?' sel':''}" data-p="${k}">${shorts[k]}<small>${names[k]}</small></button>`).join('');
+  document.querySelectorAll('.part-btn').forEach(b=>b.onclick=()=>{selPart=b.dataset.p;renderPartGrid();});
+}
+/* ================= test engine ================= */
+let stream=null, recorder=null, chunks=[], recs={}, timerId=null, testCtx=null;
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function buildSteps(set,parts){
+  const st=[];
+  if(parts.includes('q12')) set.q12.forEach((p,i)=>st.push({part:'q12',qn:i+1,
+    render:()=>`<div class="passage">${fmtGuide(p.guide)}</div>`,
+    phases:[{n:'준비',s:45},{n:'답변',s:45,rec:1}],
+    review:{ref:'지문 '+(i+1),model:fmtGuide(p.guide),note:p.tip}}));
+  if(parts.includes('q34')) set.q34.forEach((p,i)=>st.push({part:'q34',qn:i+3,
+    render:()=>`<div class="scene-box">${renderScene(p.scene)}</div>`,
+    phases:[{n:'준비',s:45},{n:'답변',s:30,rec:1}],
+    review:{ref:'그림 '+(i+1),scene:p.scene,model:p.model,note:p.tip}}));
+  if(parts.includes('q57')){
+    set.q57.qs.forEach((q,i)=>st.push({part:'q57',qn:i+5,
+      render:()=>`<div class="qintro">${esc(set.q57.intro)}</div><div class="qtext">Q${i+5}. ${esc(q.q)}</div>`,
+      speak:q.q,
+      phases:[{n:'준비',s:3},{n:'답변',s:q.t,rec:1}],
+      review:{ref:'Q'+(i+5)+'. '+q.q,model:q.model}}));
+  }
+  if(parts.includes('q810')){
+    const tbl=()=>`<table class="sched"><caption><div class="t1">${esc(set.q810.head)}</div><div class="t2">${esc(set.q810.sub)}</div></caption>`+
+      `<tbody>${set.q810.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`+
+      (set.q810.foot?`<div class="sched-foot">${esc(set.q810.foot)}</div>`:'');
+    st.push({part:'q810',qn:0,noRec:1,
+      render:tbl, phases:[{n:'자료 확인',s:45}], review:null});
+    set.q810.qs.forEach((q,i)=>st.push({part:'q810',qn:i+8,
+      render:()=>tbl()+`<div class="qtext" style="font-size:15px">Q${i+8}. ${esc(q.q)}</div>`,
+      speak:(i===0?set.q810.caller+' ':'')+q.q,
+      phases:[{n:'준비',s:3},{n:'답변',s:q.t,rec:1}],
+      review:{ref:'Q'+(i+8)+'. '+q.q,model:q.model}}));
+  }
+  if(parts.includes('q11')){
+    const p=set.q11;
+    st.push({part:'q11',qn:11,
+      render:()=>`<div class="qtext">${esc(p.q)}</div>`,
+      speak:p.q,
+      phases:[{n:'준비',s:45},{n:'답변',s:60,rec:1}],
+      review:{ref:'Q11. '+p.q,model:p.model,note:p.note}});
+  }
+  return st;
+}
+async function startTest(setIdx,parts,label){
+  const set=SETS[setIdx];
+  recs={};
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:true});}
+  catch(e){stream=null;alert('마이크 권한이 없어 녹음 없이 진행합니다. (셀프체크는 가능)');}
+  testCtx={setIdx,set,label,steps:buildSteps(set,parts),i:0,pi:0};
+  show('test');
+  runStep();
+}
+function stopAll(){
+  if(timerId){clearInterval(timerId);timerId=null;}
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  if(recorder&&recorder.state!=='inactive')try{recorder.stop();}catch(e){}
+  recorder=null;
+}
+function endStream(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
+function runStep(){
+  const c=testCtx, step=c.steps[c.i];
+  if(!step){finishTest();return;}
+  const P=PARTS[step.part];
+  $('partLabel').textContent=P.label;
+  $('partTitle').textContent=P.title;
+  $('direction').innerHTML=P.dir;
+  $('testPos').textContent=(c.i+1)+' / '+c.steps.length;
+  $('stage').innerHTML=step.render();
+  c.pi=0;
+  if(step.speak){ say(step.speak,()=>startPhase()); } else startPhase();
+}
+function startPhase(){
+  const c=testCtx, step=c.steps[c.i], ph=step.phases[c.pi];
+  if(!ph){c.i++;c.pi=0;runStep();return;}
+  const isRec=!!ph.rec&&!!stream;
+  $('phaseName').innerHTML=(ph.rec?'<span class="dot"></span>':'')+ph.n+(ph.rec?' · 녹음 중':'');
+  $('phaseSub').textContent=ph.rec?'삐 소리 후 답변하세요':'끝나면 자동으로 넘어갑니다';
+  $('ringWrap').classList.toggle('rec',!!ph.rec);
+  if(ph.rec){beep(880,.18);}
+  if(isRec){
+    chunks=[];recorder=new MediaRecorder(stream);
+    recorder.ondataavailable=e=>chunks.push(e.data);
+    const qn=step.qn;
+    recorder.onstop=()=>{if(chunks.length){recs[qn]=URL.createObjectURL(new Blob(chunks,{type:chunks[0].type||'audio/webm'}));}};
+    recorder.start();
+  }
+  let left=ph.s;
+  const total=ph.s, bar=$('ringBar');
+  const draw=()=>{$('ringNum').textContent=left;bar.style.strokeDashoffset=201*(1-left/total);};
+  draw();
+  timerId=setInterval(()=>{left--;if(left<0){nextPhase();return;}draw();if(left===0&&ph.rec)beep(660,.15);},1000);
+}
+function nextPhase(){
+  if(timerId){clearInterval(timerId);timerId=null;}
+  if(recorder&&recorder.state!=='inactive'){try{recorder.stop();}catch(e){}recorder=null;}
+  const c=testCtx;c.pi++;
+  setTimeout(startPhase,250);
+}
+$('skipBtn').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();nextPhase();};
+$('exitBtn').onclick=()=>{if(confirm('시험을 중단할까요? 녹음은 사라집니다.')){stopAll();endStream();show('home');renderHome();}};
+function finishTest(){
+  stopAll();endStream();
+  const c=testCtx;
+  $('rvSetName').textContent='Set '+(c.setIdx+1)+' · '+c.label;
+  let html='';let lastPart='';
+  c.steps.filter(s=>s.review).forEach(s=>{
+    if(s.part!==lastPart){lastPart=s.part;html+=`<div class="rv-part eyebrow">${PARTS[s.part].label} — ${PARTS[s.part].title}</div>`;}
+    html+=`<div class="card rv-card">`;
+    html+=`<div class="rv-q">${esc(s.review.ref)}</div>`;
+    if(s.review.scene)html+=`<div class="scene-box" style="max-width:340px">${renderScene(s.review.scene)}</div>`;
+    html+=recs[s.qn]?`<audio controls src="${recs[s.qn]}"></audio>`:`<p class="tiny">녹음 없음</p>`;
+    html+=`<details><summary>모범답안 보기 (AL 수준)</summary><div class="model-body">${s.review.model}</div>${s.review.note?`<div class="model-note">💡 ${esc(s.review.note)}</div>`:''}</details>`;
+    html+=`<div class="check-row">${CHECKS.map((ck,ci)=>`<label class="check-pill"><input type="checkbox" class="ck" data-q="${s.qn}"> ${ck}</label>`).join('')}</div>`;
+    html+=`</div>`;
+  });
+  $('rvBody').innerHTML=html;
+  $('scoreLine').textContent='';
+  show('review');
+}
+$('rvExit').onclick=()=>{show('home');renderHome();};
+$('saveBtn').onclick=()=>{
+  const boxes=[...document.querySelectorAll('.ck')];
+  const score=boxes.length?Math.round(100*boxes.filter(b=>b.checked).length/boxes.length):0;
+  const c=testCtx;
+  pushHist({d:todayStr(),mode:c.label==='실전 풀세트'?'full':'part',set:c.setIdx,label:'Set '+(c.setIdx+1)+' '+c.label,score});
+  $('scoreLine').textContent='저장됨 · 셀프체크 '+score+'%';
+  setTimeout(()=>{show('home');renderHome();},900);
+};
+/* ================= wire home ================= */
+$('startFull').onclick=()=>startTest(+$('fullSet').value,['q12','q34','q57','q810','q11'],'실전 풀세트');
+$('startPart').onclick=()=>{
+  const names={q12:'Q1–2 연습',q34:'Q3–4 연습',q57:'Q5–7 연습',q810:'Q8–10 연습',q11:'Q11 연습'};
+  startTest(+$('partSet').value,[selPart],names[selPart]);
+};
+$('themeBtn').onclick=()=>{
+  const r=document.documentElement;
+  const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.theme=dark?'light':'dark';
+};
+renderHome();renderPartGrid();
+</script>
+
+</body>
+</html>
