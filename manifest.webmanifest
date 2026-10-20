@@ -1,0 +1,16 @@
+{
+  "name": "토스 AL 트레이너",
+  "short_name": "토스 AL",
+  "description": "토익스피킹 AL 연습 · 만능문장 루틴",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F4EF",
+  "theme_color": "#0E7C6B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
