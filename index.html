@@ -152,6 +152,45 @@ details .model-note{padding:0 14px 12px;font-size:12.5px;color:var(--muted);font
 .tip-item .tip-body b{color:var(--accent)}
 .tip-item .tip-body .en{font-family:Georgia,serif;color:var(--ink)}
 .notice{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6}
+/* ---------- routine ---------- */
+.rt-home{border-left:4px solid var(--accent)}
+.rt-steps{display:flex;flex-direction:column;gap:6px;margin:10px 0 12px}
+.rt-step{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--soft);color:var(--ink);padding:11px 12px}
+.rt-step:disabled{opacity:.5;cursor:default}
+.rt-step:disabled:active{transform:none}
+.rt-step .ck{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--accent-ink)}
+.rt-step.done .ck{background:var(--accent);border-color:var(--accent)}
+.rt-step .st{flex:1;min-width:0}
+.rt-step .st b{display:block;font-size:14px}
+.rt-step .st small{display:block;font-size:12px;color:var(--muted)}
+.rt-step .go{flex:none;font-size:13px;font-weight:700;color:var(--accent)}
+.rt-step.done .st{opacity:.75}
+.rt-bar{height:6px;border-radius:99px;background:var(--soft);overflow:hidden;margin:6px 0 14px}
+.rt-bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.flash{text-align:center;padding:26px 18px}
+.flash .where{display:inline-block;font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px;margin-bottom:12px}
+.flash .ko{font-size:19px;font-weight:700;line-height:1.6;text-wrap:balance}
+.flash .en{font-family:Georgia,serif;font-size:19px;line-height:1.65;margin-top:14px}
+.flash .en.hide{visibility:hidden}
+.flash .hint{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.rt-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.grade button{padding:12px 6px;font-weight:700;font-size:14px}
+.g-again{background:var(--rec-soft);color:var(--rec)}
+.g-hard{background:var(--soft);color:var(--ink)}
+.g-good{background:var(--accent);color:var(--accent-ink)}
+.shadow-cnt{font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:700;color:var(--accent);margin-top:16px}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--soft);border:1px solid var(--line)}
+.dots i:nth-child(3){margin-right:8px}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.word-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.word-chips button{background:var(--soft);color:var(--ink);padding:6px 10px;font-size:13.5px;font-family:Georgia,serif}
+.pron-in{display:flex;gap:8px}
+.pron-in input{flex:1;min-width:0;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+.ipa{font-family:"Segoe UI","Lucida Sans Unicode","Arial Unicode MS",sans-serif;font-size:22px;color:var(--accent);margin:6px 0}
+.hint-box{margin-top:12px}
+.hint-box .model-body{font-size:14.5px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 
@@ -171,6 +210,18 @@ details .model-note{padding:0 14px 12px;font-size:12.5px;color:var(--muted);font
   </div>
 
   <div class="stack">
+    <div class="card mode-card rt-home">
+      <div class="eyebrow">오늘의 루틴 · 만능문장 암기</div>
+      <h2 style="margin-top:4px">출근길 → 퇴근 후 → 자기 전</h2>
+      <p id="rtSummary"></p>
+      <div class="rt-bar"><i id="rtBar" style="width:0"></i></div>
+      <div class="rt-steps" id="rtSteps"></div>
+      <div class="mode-row tiny">
+        <label>하루 새 문장 <select id="rtDaily" aria-label="하루 새 문장 수"><option value="10">10개</option><option value="12">12개</option><option value="13">13개</option><option value="15">15개</option><option value="20">20개</option></select></label>
+        <button class="btn-quiet" id="rtExport">진도 내보내기</button>
+        <button class="btn-quiet" id="rtImport">가져오기</button>
+      </div>
+    </div>
     <div class="card mode-card">
       <h2>실전 모드</h2>
       <p>Q1–Q11 풀세트 · 실제 시험 시간 그대로 · 자동 녹음 (약 20분)</p>
@@ -208,6 +259,7 @@ details .model-note{padding:0 14px 12px;font-size:12.5px;color:var(--muted);font
     </div>
 
     <p class="notice">🎙 시험 시작 시 마이크 권한을 허용해주세요. 녹음은 이 화면을 벗어나면 사라지고, 셀프체크 점수만 기록으로 남습니다.<br>
+    📌 루틴 진도는 이 기기 브라우저에 저장돼요. 폰↔PC를 오가면 [진도 내보내기/가져오기]로 옮기세요.<br>
     📌 Q3–4는 실사진 대신 일러스트입니다. 시험 2주 전부터는 기출 사진으로 보충하세요.</p>
   </div>
 </section>
@@ -254,6 +306,19 @@ details .model-note{padding:0 14px 12px;font-size:12.5px;color:var(--muted);font
     <button class="btn-primary" id="saveBtn">기록 저장</button>
     <span class="score-line" id="scoreLine"></span>
   </div>
+</section>
+
+<!-- ============ ROUTINE ============ -->
+<section id="rt" class="screen">
+  <div class="test-top">
+    <span class="pos" id="rtPos"></span>
+    <button class="btn-quiet" id="rtExit">홈으로 ✕</button>
+  </div>
+  <div class="eyebrow" id="rtLabel"></div>
+  <h2 id="rtHead" style="font-size:18px;margin:2px 0 4px"></h2>
+  <p class="tiny" id="rtSub" style="margin:0 0 4px"></p>
+  <div class="rt-bar"><i id="rtProg" style="width:0"></i></div>
+  <div id="rtStage"></div>
 </section>
 
 <!-- ============ TIPS ============ -->
@@ -846,11 +911,11 @@ function beep(freq,dur){try{AC=AC||new (window.AudioContext||window.webkitAudioC
 let voiceEn=null;
 function pickVoice(){const vs=speechSynthesis.getVoices();voiceEn=vs.find(v=>/en[-_]US/i.test(v.lang)&&/google/i.test(v.name))||vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}
 if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
-function say(text,cb){
+function say(text,cb,rate){
   if(!('speechSynthesis' in window)){cb&&cb();return;}
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  if(voiceEn)u.voice=voiceEn; u.lang='en-US'; u.rate=.95;
+  if(voiceEn)u.voice=voiceEn; u.lang='en-US'; u.rate=rate||.95;
   let done=false; const fin=()=>{if(!done){done=true;cb&&cb();}};
   u.onend=fin; u.onerror=fin;
   setTimeout(fin, 1200+text.length*90);
@@ -881,6 +946,7 @@ function renderHome(){
   const opts=SETS.map((s,i)=>`<option value="${i}">Set ${i+1} — ${esc(s.theme)}</option>`).join('');
   $('fullSet').innerHTML=opts;$('partSet').innerHTML=opts;
   const done={};hist.forEach(h=>{if(h.mode==='full')done[h.set]=1;});
+  renderRoutineHome();
 }
 let selPart='q57';
 function renderPartGrid(){
@@ -932,12 +998,12 @@ function buildSteps(set,parts){
   }
   return st;
 }
-async function startTest(setIdx,parts,label){
+async function startTest(setIdx,parts,label,extra){
   const set=SETS[setIdx];
   recs={};
   try{stream=await navigator.mediaDevices.getUserMedia({audio:true});}
   catch(e){stream=null;alert('마이크 권한이 없어 녹음 없이 진행합니다. (셀프체크는 가능)');}
-  testCtx={setIdx,set,label,steps:buildSteps(set,parts),i:0,pi:0};
+  testCtx={setIdx,set,label,extra:extra||{},steps:buildSteps(set,parts),i:0,pi:0};
   show('test');
   runStep();
 }
@@ -957,11 +1023,16 @@ function runStep(){
   $('direction').innerHTML=P.dir;
   $('testPos').textContent=(c.i+1)+' / '+c.steps.length;
   $('stage').innerHTML=step.render();
+  const hs=c.extra.hints;
+  if(hs&&hs.length)$('stage').insertAdjacentHTML('beforeend',`<details class="hint-box"><summary>💡 오늘 외운 문장 ${hs.length}개 — 막히면 열어 보세요</summary><div class="model-body">${hs.map(i=>esc(SENT[i][1])).join('<br>')}</div></details>`);
   c.pi=0;
   if(step.speak){ say(step.speak,()=>startPhase()); } else startPhase();
 }
 function startPhase(){
-  const c=testCtx, step=c.steps[c.i], ph=step.phases[c.pi];
+  if(timerId){clearInterval(timerId);timerId=null;}
+  const c=testCtx, step=c&&c.steps[c.i];
+  if(!step)return;
+  const ph=step.phases[c.pi];
   if(!ph){c.i++;c.pi=0;runStep();return;}
   const isRec=!!ph.rec&&!!stream;
   $('phaseName').innerHTML=(ph.rec?'<span class="dot"></span>':'')+ph.n+(ph.rec?' · 녹음 중':'');
@@ -992,6 +1063,7 @@ $('exitBtn').onclick=()=>{if(confirm('시험을 중단할까요? 녹음은 사�
 function finishTest(){
   stopAll();endStream();
   const c=testCtx;
+  if(c.extra.routine)rtMark('apply');
   $('rvSetName').textContent='Set '+(c.setIdx+1)+' · '+c.label;
   let html='';let lastPart='';
   c.steps.filter(s=>s.review).forEach(s=>{
@@ -1064,6 +1136,249 @@ function renderTips(){
 }
 $('tipsBtn').onclick=()=>show('tips');
 $('tipsExit').onclick=()=>show('home');
+const SENT=[["그것은 제 스트레스를 풀어 줘요. 저는 요즘 스트레스를 많이 받아서 그것이 필요해요.","It relieves my stress. I'm stressed out these days, so I need it.","q57",""],["그것은 더 저렴해서 저는 돈을 절약할 수 있어요.","It's cheaper, so I can save money.","q57",""],["가격이 합리적이에요.","The price is reasonable.","q57",""],["그것은 더 빨라서 저는 시간을 절약할 수 있어요.","It's faster, so I can save time.","q57",""],["저는 친구들에게서 유용한 정보를 많이 얻을 수 있어요.","I can get a lot of useful information from my friends.","q57",""],["그것은 더 믿을 만해서 정보가 더 신뢰가 가요.","It's more reliable, so the information is more trustworthy.","q57",""],["언제 어디서나 스마트폰으로 정보를 얻을 수 있어요.","I can get information anytime, anywhere on my smartphone.","q57",""],["그곳은 시설이 좋아요.","It has great facilities.","q57",""],["그곳은 인기 있는 곳이라 사람들이 아주 좋아해요.","It's a popular place, so people love it.","q57","복원"],["그것들은 너무 오래돼서 새것이 생기면 좋을 것 같아요.","They are too old, so I think it's good to have new ones.","q57",""],["여기에 가게가 더 많으면 더 편리할 거예요.","If we had more stores here, it would be more convenient.","q57",""],["저는 학생이라 예산이 빠듯해요.","I'm a student, so my budget is tight.","q57",""],["저는 비싼 것을 살 여유가 없어요.","I can't afford to buy expensive things.","q57",""],["저는 그것에 돈을 너무 많이 낭비하고 싶지 않아요.","I don't want to waste too much money on that.","q57",""],["그건 돈 낭비예요.","It's a waste of money.","q57",""],["저는 학생이라 학업으로 바빠요.","I'm a student, so I'm busy with my schoolwork.","q57",""],["저는 시간이 별로 없어요.","I don't have much time.","q57",""],["저는 그것에 시간을 낭비하고 싶지 않아요.","I don't want to waste time on that.","q57",""],["그건 시간 낭비예요.","It's a waste of time.","q57",""],["그것은 저한테 꼭 필요해요.","It's necessary for me.","q57",""],["저는 그것을 자주 이용해요.","I frequently use it.","q57",""],["그것은 저를 행복하게 해 주고 좋은 경험을 할 수 있게 해 줘요.","It makes me happy and I can have a great experience.","q57",""],["그곳은 좋은 환경과 즐거운 경험을 제공해요.","They provide a good environment and a pleasant experience.","q57",""],["저는 새로운 것에 도전해 보는 것을 좋아해요.","I like to try new things.","q57",""],["그것은 믿을 만해서 저는 그 제품을 신뢰할 수 있어요.","It's reliable, so I can trust the product.","q57",""],["그것은 인기 있는 물건이라 사람들이 좋아할 거예요.","It's a popular item, so people will love it.","q57",""],["그것은 정서적인 가치가 담겨 있어요.","It has sentimental value.","q57",""],["그것은 좋은 선물이에요.","It's a good gift.","q57",""],["그것은 제 일상의 일부예요.","It's part of my routine.","q57",""],["그것은 제 습관이에요.","It's my habit.","q57",""],["저는 그것이 정말 좋았어요.","I really liked it.","q57",""],["그것은 훌륭했어요.","It was great.","q57",""],["그것은 근사했어요.","It was awesome.","q57",""],["그것은 더 싸고 더 빨라요.","It's cheaper and faster.","q57",""],["그것은 매우 편리하고 유용해요.","It's very convenient and useful.","q57",""],["그것은 저에게 매우 도움이 돼요.","It's very helpful to me.","q57",""],["그것은 제가 가장 좋아하는 일이에요.","It's my favorite thing to do.","q57",""],["그것은 저를 행복하게 해 줘서 저는 걱정을 잊을 수 있어요.","It makes me happy, so I can forget about my worries.","q57",""],["그것은 더 재미있고 즐거워서 저는 지루하지 않아요.","It's more fun and entertaining, so I don't get bored.","q57",""],["저는 여럿이 함께하는 것이 더 재미있다고 생각해요.","I think it's more fun to do things in a group.","q57",""],["저는 새로운 사람들을 만나고 친구를 사귈 수 있어요.","I can meet new people and make friends.","q57",""],["저는 더 편안함을 느끼고 더 잘 집중할 수 있어요.","I feel more comfortable and I can focus better.","q57",""],["저는 다른 사람들을 기다리느라 시간을 낭비할 필요가 없어요.","I don't have to waste time waiting for others.","q57",""],["저는 집에서 더 편안함을 느껴요.","I feel more comfortable at home.","q57",""],["외출하느라 시간을 낭비할 필요가 없어서 저는 시간을 절약할 수 있어요.","I can save time because I don't have to waste time going out.","q57",""],["그것은 더 개인적이고 더 가까운 관계를 쌓을 수 있어요.","It's more personal and builds a closer relationship.","q57",""],["그것은 오해를 덜 불러일으켜요.","It causes less misunderstanding.","q57",""],["그들은 새로운 것들을 배울 수 있어요.","They can learn new things.","q11",""],["그들은 새로운 사람들을 만나고 인맥을 넓힐 수 있어요.","They can meet new people and expand their network.","q11",""],["그들은 새로운 경험을 많이 하고 견문을 넓힐 수 있어요.","They can have a lot of new experiences and broaden their perspective.","q11",""],["그들은 아직 충분히 성숙하지 않아서 올바른 결정을 내리지 못해요.","They can't make good decisions because they are not mature enough.","q11",""],["그들은 집중력이 흐트러질 거예요.","They will be distracted.","q11",""],["그들은 공부에 집중할 수 없어요.","They can't focus on their studies.","q11","복원"],["그들은 일에 집중할 수 없어요.","They can't focus on their work.","q11",""],["그들은 학교에서 좋은 성적을 받을 수 없어요.","They can't get good grades at school.","q11",""],["그들은 수업에서 뒤처질 거예요.","They will fall behind in class.","q11",""],["그들은 효율적으로 일할 수 없어요.","They can't work efficiently.","q11",""],["그들은 돈을 절약할 수 있어요.","They can save money.","q11",""],["생활비가 너무 비싸요.","The cost of living is too high.","q11",""],["그들은 생계를 유지할 수 없어요.","They can't make a living.","q11",""],["저는 높은 급여를 받을 수 있어요.","I can get a high salary.","q11",""],["저는 더 높은 급여를 받을 수 있어요.","I can get a higher salary.","q11",""],["그것은 삶을 더 낫게 만들어 주기 때문에 좋은 투자예요.","That's a good investment because it makes lives better.","q11",""],["그들은 더 잘 집중할 수 있어요.","They can focus better.","q11",""],["그들은 다른 사람들 때문에 방해받지 않을 거예요.","They will not be distracted by others.","q11",""],["그들은 자기 일정을 직접 짤 수 있어요.","They can set their own schedule.","q11",""],["그들은 더 많은 자유를 누릴 수 있어요.","They can have more freedom.","q11",""],["그들은 정보를 얻고 다른 사람들과 공유할 수 있어요.","They can get information and share it with other people.","q11",""],["그것은 더 가족처럼 느껴져요.","It feels more like a family.","q11",""],["그들은 인터넷에서 유용한 정보를 많이 얻을 수 있어요.","They can get a lot of useful information on the internet.","q11",""],["그들은 인터넷에서 최신 정보를 많이 얻을 수 있어요.","They can get a lot of latest information on the internet.","q11",""],["그것은 더 빠르고 더 편리해요.","It's faster and more convenient.","q11",""],["인터넷에는 부정확한 정보가 많아서 믿을 만하지 않아요.","There is a lot of inaccurate information on the internet, so it's not reliable.","q11",""],["그것은 학생들의 집중을 크게 방해해서 학생들이 공부에 집중할 수 없어요.","It is very distracting for students, so students can't focus on their studies.","q11",""],["그것은 학생들의 집중을 크게 방해해서 학생들이 일에 집중할 수 없어요.","It is very distracting for students, so students can't focus on their work.","q11",""],["저는 즉시 답변을 받을 수 있어요.","I can get responses right away.","q11",""],["저는 말하는 사람의 감정을 더 정확하게 이해할 수 있어요.","I can understand the speaker's feelings more accurately.","q11",""],["그들은 친근한 업무 분위기를 만들 수 있어요.","They can create a friendly work atmosphere.","q11",""],["그들은 친근한 분위기를 만들 수 있어요.","They can create a friendly atmosphere.","q11",""],["그들은 다른 사람들과 더 잘 소통할 수 있어요.","They can communicate with others better.","q11",""],["그들은 좋은 팀원이 될 수 있고 다른 사람들과 좋은 관계를 맺을 수 있어요.","They can be good team players and make good relationships with others.","q11",""],["그들은 좋은 평판을 얻을 수 있어요.","They can have a good reputation.","q11",""],["그들은 매우 영향력 있을 수 있어요.","They can be very influential.","q11",""],["그들은 다른 사람들에게 동기를 부여할 수 있어요.","They can motivate others.","q11",""],["모든 것이 항상 변하고 경쟁이 치열해요.","Everything is always changing and there is a lot of competition.","q11",""],["그들은 많은 도전과 어려움에 직면해요.","They face a lot of challenges and difficulties.","q11",""],["그는 자신감 덕분에 다양한 상황에 대처할 수 있어요.","He is able to handle a variety of situations due to his confidence.","q11",""],["그들은 경험이 많아요.","They have a lot of experience.","q11","복원"],["그들은 지식이 많아요.","They have a lot of knowledge.","q11",""],["직원들은 더 효율적이고 생산적으로 일할 수 있어요.","Employees can work more efficiently and productively.","q11",""],["직원들은 자기 직업에 더 만족할 수 있어요.","Employees can be more satisfied with their jobs.","q11",""],["그것은 더 나은 업무 환경을 만들 수 있어요.","It can make a better work environment.","q11",""],["그들은 덜 전문적으로 보일 수 있어요.","They might appear less professional.","q11",""],["고객들은 만족하고 계속 단골로 남을 거예요.","Customers will feel satisfied and remain loyal.","q11",""],["그것은 더 많은 고객을 끌어들일 거예요.","It will attract more customers.","q11",""],["그 사업은 더 성공할 거예요.","The business will be more successful.","q11",""],["사람들이 소셜 미디어를 자주 써서 그것은 매우 효과적일 거예요.","People frequently use social media, so it will be very effective.","q11",""],["그것은 그들의 스트레스를 풀어 주고 그들은 편히 쉴 수 있어요.","It relieves their stress and they can relax.","q11",""],["그것은 그들의 신체 건강에 좋아요.","It is good for their physical health.","q11",""],["그것은 그들의 정신 건강에 좋아요.","It is good for their mental health.","q11",""],["그것은 그들의 건강에 좋아요.","It is good for their health.","q11",""],["그것은 그들의 건강에 좋지 않아요.","It is not good for their health.","q11",""],["그것은 건강한 습관을 기를 수 있어요.","It can develop healthy habits.","q11",""],["그것은 건강하지 않은 습관을 기를 수 있어요.","It can develop unhealthy habits.","q11",""],["그것은 환경에 좋아요.","It is good for the environment.","q11",""],["환경오염은 요즘 심각한 문제예요.","Pollution is a serious issue these days.","q11",""],["그것은 더 깨끗한 환경을 만들 수 있어요.","It can make a cleaner environment.","q11",""],["우리는 환경을 보호할 수 있을 거예요.","We will be able to protect the environment.","q11",""],["무엇보다 사람들은 인터넷에서 아주 빠르게 답을 찾을 수 있어서 시간을 아끼고 정보를 바로 얻을 수 있어요. 하지만 예전에는 도서관에 가서 책을 뒤져야 해서 찾는 것을 찾는 데 시간이 오래 걸렸어요.","Most of all, people can find answers very quickly on the internet, so they can save time and get the information right away. However, in the past, people had to go to the library and look through books, so it took a long time to find what they were looking for.","q11",""],["예전에는 학생들이 공부하려면 교실에 가야 했어요.","Previously, students had to go to a classroom to study.","q11",""],["하지만 요즘은 어디 가지 않아도 온라인으로 공부할 수 있어요.","But these days, they can study online without going anywhere.","q11",""],["사람들은 예전에는 택시를 기다리곤 했지만 지금은 모바일 앱으로 택시를 불러요.","People used to wait for a taxi, but now they use mobile apps to call a taxi.","q11",""],["과거와 비교하면 사람들은 온라인에서 정보를 더 쉽고 빠르게 얻을 수 있어요.","Compared to the past, people can get information more easily and quickly online.","q11",""],["기술 덕분에 많은 직장인들이 재택근무를 하고 시간을 아낄 수 있어요.","Thanks to technology, many workers can work from home and save time.","q11",""],["이것은 공원에서 찍힌 사진이에요.","This is a picture taken at a park.","q34",""],["이 사진에서 가장 먼저 볼 수 있는 것은 두 명의 여자예요.","The first thing I can see in this picture is two women.","q34",""],["사진의 전경에는 분수대가 보여요.","In the foreground of the picture, I can see a fountain.","q34",""],["사진의 중앙에는 분수대가 보여요.","In the middle of the picture, I can see a fountain.","q34",""],["사진의 배경에는 분수대가 보여요.","In the background of the picture, I can see a fountain.","q34",""],["사진의 왼쪽에는 인도가 있어요.","On the left side of the picture, there is a sidewalk.","q34",""],["사진의 오른쪽에는 인도가 있어요.","On the right side of the picture, there is a sidewalk.","q34",""],["그녀의 옆에 또 다른 여자가 있어요.","Next to her, there is another woman.","q34",""],["그녀의 뒤에 서 있는 두 명의 남성이 보여요.","Behind her, I can see two men standing.","q34",""],["그들 중 대부분은 정장을 입고 있어요.","Most of them are wearing formal clothes.","q34",""],["그들 중 일부는 캐주얼한 옷을 입고 있어요.","Some of them are wearing casual clothes.","q34",""],["그녀는 메뉴판을 보고 있어요.","She is looking at a menu.","q34",""],["그는 무언가를 적고 있어요.","He is writing something down.","q34",""],["그는 물을 마시고 있어요.","He is drinking water.","q34","복원"],["그녀는 고객들에게 음식을 제공하고 있어요.","She is serving food to customers.","q34",""],["그녀는 컵을 들고 있어요.","She is holding a cup.","q34",""],["그들은 계산대에 서 있어요.","They are standing at the cashier.","q34",""],["그들은 대화를 나누고 있어요.","They are having a conversation.","q34",""],["그녀는 가방 안을 들여다보고 있어요.","She is looking into a bag.","q34",""],["그는 고객들을 돕고 있어요.","He is helping customers.","q34",""],["그들은 테이블에 앉아 있어요.","They are sitting at a table.","q34",""],["그는 무언가를 찾고 있어요.","He is looking for something.","q34",""],["그는 신용카드를 건네주고 있어요.","He is handing over a credit card.","q34",""],["그는 카트를 밀고 있어요.","He is pushing a cart.","q34",""],["그는 제품을 보고 있어요.","He is looking at a product.","q34",""],["그들은 줄을 서서 기다리고 있어요.","They are waiting in line.","q34",""],["그들은 물건들을 정리하고 있어요.","They are arranging items.","q34",""],["그녀는 쇼핑백을 들고 있어요.","She is holding a shopping bag.","q34",""],["그는 물건을 집으려고 손을 뻗고 있어요.","He is reaching for an item.","q34",""],["그는 비닐봉지를 들고 있어요.","He is holding a plastic bag.","q34",""],["그는 한 손을 들고 있어요.","He is raising his hand.","q34",""],["그녀는 문서를 들고 있어요.","She is holding a document.","q34",""],["그는 발표를 하고 있어요.","He is making a presentation.","q34",""],["그는 태블릿을 사용하고 있어요.","He is using a tablet PC.","q34",""],["그들은 문서를 읽고 있어요.","They are reading a document.","q34",""],["그는 옷걸이에 옷을 걸고 있어요.","He is hanging his clothes on a rack.","q34",""],["그녀는 종이 한 장을 줍고 있어요.","She is picking up a piece of paper.","q34",""],["사진을 찍고 있는 한 남자가 있어요.","There is a man taking a picture.","q34",""],["그녀는 개를 산책시키고 있어요.","She is walking a dog.","q34",""],["그는 바닥에 누워 있어요.","He is lying on the ground.","q34",""],["그녀는 유모차를 밀고 있어요.","She is pushing a baby stroller.","q34",""],["그는 보트를 타고 있어요.","He is riding a boat.","q34",""],["그는 트럭에 상자를 싣고 있어요.","He is loading a box into a truck.","q34",""],["그는 해변 의자에서 쉬고 있어요.","He is relaxing on a beach chair.","q34",""],["그들은 계단을 내려가고 있어요.","They are walking down the stairs.","q34",""],["그들은 길을 건너고 있어요.","They are crossing the street.","q34",""],["그들은 길을 걸어가고 있어요.","They are walking on the street.","q34",""],["그녀는 스마트폰을 보고 있어요.","She is looking at a smartphone.","q34",""],["그들은 공연하고 있어요.","They are performing.","q34",""],["회의가 6월 20일에 힐튼 호텔에서 열릴 예정이에요.","The conference will be held on June 20th at the Hilton Hotel.","q810",""],["미팅은 오전 9시에 시작할 거예요.","The meeting will start at 9 a.m.","q810",""],["세미나는 오후 5시에 끝날 거예요.","The seminar will end at 5 p.m.","q810",""],["아니요, 유감스럽지만 잘못 알고 계세요. 사실 등록 및 커피 타임은 오전 9시에 시작해요.","No, I'm afraid that you have the wrong information. Actually, the registration and coffee session will start at 9 a.m.","q810",""],["두 개의 세션이 있어요. 먼저 오후 1시에 레이 킹스턴의 소셜 미디어 마케팅 워크숍이 있어요. 다음으로 오후 2시 30분에 케빈 델몬트의 '마케팅으로 스포츠 팬에게 어필하기' 토론이 있어요.","There are two sessions. First, at 1 p.m., there is a workshop on social media marketing by Ray Kingston. Next, at 2:30 p.m., there is a discussion on appealing to sports fans through marketing by Kevin Delmont.","q810",""],["당신은 오전 10시에 샌프란시스코에서 출발할 거예요.","You will depart from San Francisco at 10 a.m.","q810",""],["당신은 오후 3시에 로스앤젤레스에 도착할 거예요.","You will arrive in Los Angeles at 3 p.m.","q810","복원"],["당신은 대한항공 105편을 탈 거예요.","You will take Korean Air 105.","q810","복원"],["당신은 글렌 호텔에 머무를 거예요.","You will stay at the Glen Hotel.","q810",""],["당신은 점심 식사를 할 거예요.","You will have lunch.","q810",""],["당신은 저녁 식사를 할 거예요.","You will have dinner.","q810",""],["당신은 회의를 할 거예요.","You will have a meeting.","q810",""],["당신은 연설을 할 거예요.","You will give a speech.","q810",""],["당신은 프레젠테이션을 할 거예요.","You will give a presentation.","q810",""],["당신은 강의를 할 거예요.","You will give a lecture.","q810",""],["인터뷰가 예정되어 있었으나 취소되었어요.","There was supposed to be an interview, but it has been canceled.","q810",""],["미팅이 예정되어 있었으나 연기되었어요.","There was supposed to be a meeting, but it has been postponed.","q810",""],["화요일 오후 2시에 제인 화이트 씨와 미팅이 예정되어 있었으나 금요일로 조정되었어요.","There was supposed to be a meeting with Jane White at 2 p.m. on Tuesday, but it has been rescheduled to Friday.","q810",""],["그녀는 2010년에 밴쿠버 예술대학교에서 디자인 석사 학위를 받았어요.","She got a master's degree in design from Vancouver Art University in 2010.","q810","복원"],["2015년부터 2017년까지 그녀는 재스퍼 패션 잡지사에서 이사로 일했어요.","From 2015 to 2017, she worked at Jasper Fashion Magazine as a director.","q810",""],["2017년부터 지금까지 그녀는 토론토 패션 잡지사에서 편집장으로 일하고 있어요.","From 2017 up to now, she has worked at Toronto Fashion Magazine as a chief editor.","q810",""],["저는 그녀가 자격을 갖췄다고 생각해요. 왜냐하면 ~","I think she is qualified because ~","q810",""],["그는 스페인어를 유창하게 해요.","He is fluent in Spanish.","q810",""],["그녀는 필라테스 자격증이 있어요.","She is certified in Pilates.","q810",""],["그는 교육 분야 경험이 있어요.","He has experience in education.","q810",""],["당신은 오전 9시에 제시카 앤더슨과 면접을 볼 거예요.","You will interview Jessica Anderson at 9 a.m.","q810",""],["마케팅 부장직에 지원한 에코전자의 존 화이트 씨와 면접이 있어요.","There is an interview with John White from Eco Electronics, who is applying for the marketing manager position.","q810","복원"],["그녀는 5년의 경력이 있어요.","She has five years of experience.","q810",""],["그는 편집자 직책에 지원하고 있어요.","He is applying for the editor position.","q810",""],["유화 수업료로 20달러를 내셔야 해요.","You have to pay $20 for the oil painting class.","q810",""],["그것은 20달러예요.","It's $20.","q810","복원"],["1월 3일까지 등록하셔야 해요.","You should register by January 3rd.","q810",""],["회원이시라면 20달러예요.","If you are a member, it's $20.","q810","복원"],["그것은 무료예요.","It's free.","q810",""],["그것은 회원 전용이에요.","It's for members.","q810",""],["초보자를 위한 요리 수업이 있어요.","There is a cooking for beginners class.","q810",""],["숀 킴 강사가 회화 수업을 맡을 거예요.","Sean Kim will teach the painting class.","q810","복원"],["프랑스 예술사 수업이 있어요.","There is a class on French art history.","q810",""],["제니퍼 휴스턴 강사가 컴퓨터 활용 수업을 맡을 예정이에요.","Jennifer Houston will teach a class on computer skills.","q810",""]];
+/* ================= daily routine (만능문장 암기) ================= */
+const PART_KO={q57:'Q5–7 이유·경험 답변',q11:'Q11 의견 근거',q34:'Q3–4 사진 묘사',q810:'Q8–10 표 안내'};
+const RKEY='tosal_routine';
+const IVL=[1,2,4,7,15,30,60]; // 칸(box)별 다음 복습까지 일수
+function rtLoad(){try{const s=JSON.parse(localStorage.getItem(RKEY)||'null');if(s&&s.cards)return s;}catch(e){}return{cards:{},daily:13,log:{},pron:[]};}
+let RT=rtLoad(), rtCtx=null, rtRate=.95;
+function rtSave(){try{localStorage.setItem(RKEY,JSON.stringify(RT));}catch(e){}}
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return todayStr(d);}
+function rtDay(){const t=todayStr();return RT.log[t]||(RT.log[t]={});}
+function rtMark(k){rtDay()[k]=1;rtSave();}
+function hush(){if('speechSynthesis' in window)speechSynthesis.cancel();}
+function rtNewIds(){
+  const L=RT.log[todayStr()];if(L&&L.newIds)return L.newIds;
+  const ids=[];for(let i=0;i<SENT.length&&ids.length<RT.daily;i++)if(!RT.cards[i])ids.push(i);
+  return ids;
+}
+function rtDue(){
+  const t=todayStr(),L=RT.log[t],ex=new Set((L&&L.newIds)||[]);
+  return Object.keys(RT.cards).map(Number).filter(i=>RT.cards[i].due<=t&&!ex.has(i))
+    .sort((a,b)=>RT.cards[a].due<RT.cards[b].due?-1:RT.cards[a].due>RT.cards[b].due?1:a-b);
+}
+function rtGrade(i,g){ // g: 0 모름 · 1 애매 · 2 앎
+  const c=RT.cards[i]||(RT.cards[i]={b:0});
+  c.b=g===0?0:g===2?Math.min(c.b+1,IVL.length-1):c.b;
+  c.due=addDays(IVL[c.b]);
+}
+function rtLastIds(){ // 오늘 외운 문장, 없으면 가장 최근에 외운 날의 문장
+  const t=todayStr();if(RT.log[t]&&RT.log[t].learn)return RT.log[t].newIds;
+  const days=Object.keys(RT.log).filter(d=>RT.log[d].learn).sort();
+  return days.length?RT.log[days[days.length-1]].newIds:[];
+}
+/* ---------- home card ---------- */
+function renderRoutineHome(){
+  const L=RT.log[todayStr()]||{}, due=rtDue().length, nw=rtNewIds(), learned=Object.keys(RT.cards).length, night=rtLastIds();
+  const steps=[
+    ['review','🚇 출근길 · 복습',due?`복습할 문장 ${due}개 — 한국어 보고 영어로 말하기`:'오늘 복습할 문장이 없어요',!due],
+    ['learn','🏠 퇴근 후 · 새 문장 '+nw.length+'개',nw.length?'이해 → 섀도잉 3회×2세트 → 즉시 테스트 (약 40분)':'202문장을 모두 시작했어요 — 복습만 하면 돼요',!nw.length],
+    ['apply','🎙 퇴근 후 · 실전 녹음','오늘 문장을 써서 실전 문제 녹음 (약 15분)',false],
+    ['pron','🔤 퇴근 후 · 발음 1개','어색했던 단어 1개를 발음기호로 교정 (5분)',false],
+    ['night','🌙 자기 전 · 테스트',night.length?`최근 외운 ${night.length}문장 다시 말해 보기 (5분)`:'새 문장을 먼저 외우면 열려요',!night.length],
+  ];
+  const doneN=steps.filter(s=>L[s[0]]).length;
+  $('rtSummary').textContent=`시작한 문장 ${learned} / ${SENT.length} · 오늘 ${doneN} / 5 완료`;
+  $('rtBar').style.width=(100*learned/SENT.length)+'%';
+  $('rtSteps').innerHTML=steps.map(([k,t,s,off])=>{
+    const dis=off&&!L[k];
+    return `<button class="rt-step${L[k]?' done':''}" data-k="${k}"${dis?' disabled':''}><span class="ck">${L[k]?'✓':''}</span><span class="st"><b>${t}</b><small>${s}</small></span><span class="go">${dis?'':L[k]?'다시':'시작 →'}</span></button>`;
+  }).join('');
+  document.querySelectorAll('.rt-step').forEach(b=>b.onclick=()=>rtStart(b.dataset.k));
+  $('rtDaily').value=RT.daily;
+}
+function rtStart(k){({review:rtReview,learn:rtLearn,apply:rtApply,pron:rtPron,night:rtNight})[k]();}
+/* ---------- routine screen helpers ---------- */
+function rtScreen(label,head,sub){$('rtLabel').textContent=label;$('rtHead').textContent=head;$('rtSub').textContent=sub||'';$('rtStage').innerHTML='';rtProg(0,0);show('rt');}
+function rtProg(n,total){$('rtProg').style.width=(total?100*n/total:0)+'%';$('rtPos').textContent=total?Math.min(n+1,total)+' / '+total:'';}
+function rtHome(){if(rtCtx)rtCtx.stopped=true;rtCtx=null;hush();show('home');renderHome();}
+$('rtExit').onclick=rtHome;
+function sentCard(i,showEn){
+  const s=SENT[i];
+  return `<div class="where">${PART_KO[s[2]]}${s[3]?' · ⚠ 자막 복원 문장':''}</div><div class="ko">${esc(s[0])}</div><div class="en${showEn?'':' hide'}" id="fEn">${esc(s[1])}</div>`;
+}
+function rtDoneScreen(t,b){
+  $('rtProg').style.width='100%';$('rtPos').textContent='';
+  $('rtStage').innerHTML=`<div class="card flash"><div class="ko">${t}</div><p class="hint" style="font-size:14px">${b}</p><div class="rt-actions"><button class="btn-primary" id="rtBack">루틴으로 돌아가기</button></div></div>`;
+  $('rtBack').onclick=rtHome;
+}
+/* 한국어 → 영어로 말하기 → 정답 확인 → 모름/애매/앎. 모름은 맨 뒤로 다시. */
+function rtQuiz(ids,opt){
+  const ctx=rtCtx={q:ids.slice(),first:{},total:ids.length,known:0};
+  rtScreen(opt.label,opt.head,'한국어를 보고 영어로 소리 내어 말한 다음 정답을 확인하세요. 모름은 맨 뒤로 다시 나와요.');
+  const next=()=>{
+    if(ctx.stopped)return;
+    if(!ctx.q.length){opt.done(ctx);return;}
+    rtProg(ctx.total-ctx.q.length,ctx.total);
+    const i=ctx.q[0];
+    $('rtStage').innerHTML=`<div class="card flash">${sentCard(i,false)}<div class="rt-actions" id="fAct"><button class="btn-primary" id="fShow">말해 봤어요 → 정답 보기</button></div></div>`;
+    $('fShow').onclick=()=>{
+      $('fEn').classList.remove('hide');say(SENT[i][1],null,rtRate);
+      $('fAct').outerHTML=`<div class="rt-actions"><button class="btn-ghost" id="fAgain">🔊 다시 듣기</button></div><div class="grade"><button class="g-again" data-g="0">모름</button><button class="g-hard" data-g="1">애매</button><button class="g-good" data-g="2">앎</button></div>`;
+      $('fAgain').onclick=()=>say(SENT[i][1],null,rtRate);
+      document.querySelectorAll('.grade button').forEach(b=>b.onclick=()=>{
+        const g=+b.dataset.g;hush();ctx.q.shift();
+        if(!(i in ctx.first)){ctx.first[i]=g;if(g===2)ctx.known++;}
+        if(g===0)ctx.q.push(i);
+        next();
+      });
+    };
+  };
+  next();
+}
+/* ---------- 1. 출근길 복습 ---------- */
+function rtReview(){
+  const ids=rtDue();if(!ids.length){rtHome();return;}
+  rtQuiz(ids,{label:'🚇 출근길 복습',head:`복습 ${ids.length}문장`,done:ctx=>{
+    Object.keys(ctx.first).forEach(i=>rtGrade(+i,ctx.first[i]));rtMark('review');
+    pushHist({d:todayStr(),mode:'routine',set:-1,label:'루틴 · 복습 '+ctx.total+'문장',score:Math.round(100*ctx.known/ctx.total)});
+    rtDoneScreen('복습 끝!',`${ctx.total}문장 중 ${ctx.known}개를 한 번에 말했어요. 모름·애매였던 문장은 더 일찍 다시 나와요.`);
+  }});
+}
+/* ---------- 2. 새 문장: 이해 → 섀도잉 → 즉시 테스트 ---------- */
+function rtLearn(){
+  const L=rtDay();if(!L.newIds){L.newIds=rtNewIds();rtSave();}
+  if(!L.newIds.length){rtHome();return;}
+  rtCtx={k:0,ids:L.newIds};
+  rtScreen('🏠 퇴근 후 · 새 문장','','');
+  rtLearnOne();
+}
+function rtLearnOne(){
+  const ctx=rtCtx;if(!ctx||ctx.stopped)return;
+  if(ctx.k>=ctx.ids.length){rtLearnTest();return;}
+  const i=ctx.ids[ctx.k];rtProg(ctx.k,ctx.ids.length);
+  $('rtHead').textContent=`새 문장 ${ctx.k+1} / ${ctx.ids.length}`;
+  $('rtSub').textContent='① 이해 — 뜻을 해석하고, 이 문장을 어떤 문제에 쓸지 떠올려 보세요.';
+  $('rtStage').innerHTML=`<div class="card flash">${sentCard(i,true)}<div class="rt-actions"><button class="btn-ghost" id="lListen">🔊 듣기</button><button class="btn-primary" id="lShadow">② 섀도잉 시작 →</button></div></div>`;
+  $('lListen').onclick=()=>say(SENT[i][1],null,rtRate);
+  $('lShadow').onclick=()=>rtShadow(i);
+}
+function rtShadow(i){
+  const ctx=rtCtx, sh={r:0,tok:null};
+  $('rtSub').textContent='② 섀도잉 — 듣고 바로 따라 말하기 3회 × 2세트. 억양·연음은 똑같이, 속도는 느려도 괜찮아요.';
+  $('rtStage').innerHTML=`<div class="card flash">${sentCard(i,true)}<div class="shadow-cnt" id="shCnt"></div><div class="dots" id="shDots"></div><p class="hint" id="shMsg"></p>`+
+    `<div class="rt-actions"><button class="btn-ghost" id="shPause">⏸ 멈춤</button><button class="btn-ghost" id="shRate"></button><button class="btn-ghost" id="shNext">다음 문장 →</button></div></div>`;
+  const rateLbl=()=>{$('shRate').textContent=rtRate<.9?'🐢 느리게':'▶ 보통 속도';};rateLbl();
+  const loop=tok=>{
+    if(sh.tok!==tok||ctx.stopped)return;
+    $('shDots').innerHTML=[0,1,2,3,4,5].map(k=>`<i class="${k<sh.r?'on':''}"></i>`).join('');
+    if(sh.r>=6){
+      sh.tok=null;$('shCnt').textContent='2세트 완료 ✓';$('shMsg').textContent='좋아요! 다음 문장으로 넘어가세요.';
+      $('shNext').className='btn-primary';$('shPause').textContent='⟲ 한 번 더';return;
+    }
+    $('shCnt').textContent=(sh.r<3?'1세트':'2세트')+' · '+(sh.r%3+1)+' / 3';
+    $('shMsg').textContent='🔊 듣는 중…';
+    const t0=Date.now();
+    say(SENT[i][1],()=>{
+      if(sh.tok!==tok||ctx.stopped)return;
+      $('shMsg').textContent='🗣 지금 따라 말하세요!';
+      const gap=Math.max(1500,(Date.now()-t0)*1.15+500); // 들은 길이만큼 따라 말할 시간
+      setTimeout(()=>{if(sh.tok!==tok)return;sh.r++;setTimeout(()=>loop(tok),sh.r===3?1200:250);},gap);
+    },rtRate);
+  };
+  const start=()=>{sh.tok={};$('shPause').textContent='⏸ 멈춤';loop(sh.tok);};
+  $('shPause').onclick=()=>{
+    if(sh.r>=6){sh.r=0;$('shNext').className='btn-ghost';start();return;}
+    if(sh.tok){sh.tok=null;hush();$('shPause').textContent='▶ 이어서';$('shMsg').textContent='멈춤';}
+    else start();
+  };
+  $('shRate').onclick=()=>{rtRate=rtRate<.9?.95:.75;rateLbl();};
+  $('shNext').onclick=()=>{sh.tok=null;hush();ctx.k++;rtLearnOne();};
+  start();
+}
+function rtLearnTest(){
+  const ids=rtCtx.ids;
+  rtQuiz(ids,{label:'🏠 ③ 즉시 테스트',head:`방금 외운 ${ids.length}문장 테스트`,done:ctx=>{
+    ids.forEach(i=>{RT.cards[i]={b:0,due:addDays(1)};});
+    rtMark('learn');
+    pushHist({d:todayStr(),mode:'routine',set:-1,label:'루틴 · 새 문장 '+ids.length+'개',score:Math.round(100*ctx.known/ctx.total)});
+    rtDoneScreen(`새 문장 ${ids.length}개 완료!`,`한 번에 말한 문장 ${ctx.known} / ${ctx.total}. 이어서 실전 녹음 → 발음 1개 → 자기 전 테스트를 하세요. 오늘 문장은 내일 출근길 복습에 나와요.`);
+  }});
+}
+/* ---------- 3. 실전 녹음 (기존 시험 엔진 + 오늘 문장 힌트) ---------- */
+function rtApply(){
+  let ids=rtLastIds();if(!ids.length)ids=(RT.log[todayStr()]||{}).newIds||rtNewIds();
+  const cnt={};ids.forEach(i=>cnt[SENT[i][2]]=(cnt[SENT[i][2]]||0)+1);
+  const part=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'q57';
+  let hints=ids.filter(i=>SENT[i][2]===part);if(hints.length<3)hints=ids;
+  const setIdx=Object.values(RT.log).filter(l=>l.apply).length%SETS.length;
+  const names={q34:'Q3–4',q57:'Q5–7',q810:'Q8–10',q11:'Q11'};
+  startTest(setIdx,[part],'루틴 실전 '+names[part],{routine:1,hints});
+}
+/* ---------- 4. 발음 1개 ---------- */
+function rtPron(){
+  let ids=rtLastIds();if(!ids.length)ids=rtNewIds();
+  const words=[...new Set(ids.flatMap(i=>SENT[i][1].replace(/[^A-Za-z' ]/g,' ').split(/\s+/)).filter(w=>w.length>=5).map(w=>w.toLowerCase()))].slice(0,30);
+  rtCtx={};
+  rtScreen('🔤 퇴근 후 · 발음 1개','어색했던 단어 1개 고치기','따라 말하다 혀가 꼬인 단어를 고르거나 직접 입력하세요.');
+  const notes=(RT.pron||[]).slice(-12).reverse();
+  $('rtStage').innerHTML=`<div class="card"><div class="eyebrow">최근 외운 문장의 단어</div><div class="word-chips">${words.map(w=>`<button data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div>`+
+    `<div class="pron-in"><input id="pwIn" placeholder="단어 입력 (예: comfortable)" autocomplete="off" autocapitalize="off"><button class="btn-primary" id="pwGo">찾기</button></div><div id="pwOut"></div></div>`+
+    (notes.length?`<div class="card" style="margin-top:14px"><div class="eyebrow">내 발음 노트</div><div class="word-chips">${notes.map(n=>`<button data-w="${esc(n.w)}">${esc(n.w)} <span class="tiny">${esc(n.ipa||'')}</span></button>`).join('')}</div></div>`:'');
+  document.querySelectorAll('.word-chips button').forEach(b=>b.onclick=()=>{$('pwIn').value=b.dataset.w;rtLookup(b.dataset.w);});
+  $('pwGo').onclick=()=>rtLookup($('pwIn').value);
+  $('pwIn').onkeydown=e=>{if(e.key==='Enter')rtLookup($('pwIn').value);};
+}
+async function rtLookup(w){
+  w=(w||'').trim().toLowerCase().replace(/[^a-z' -]/g,'');if(!w)return;
+  $('pwOut').innerHTML='<p class="tiny">찾는 중…</p>';
+  let ipa='',audio='';
+  try{
+    const r=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(w));
+    if(r.ok){
+      const j=await r.json(),ph=j.flatMap(e=>e.phonetics||[]);
+      const us=ph.find(p=>/-us\.mp3$/.test(p.audio||''))||ph.find(p=>p.audio)||{};
+      ipa=(ph.find(p=>p.text&&us.audio&&p.audio===us.audio)||ph.find(p=>p.text)||{}).text||(j[0]&&j[0].phonetic)||'';
+      audio=us.audio||'';
+    }
+  }catch(e){}
+  if(!ipa){try{
+    const r=await fetch('https://en.wiktionary.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&origin=*&page='+encodeURIComponent(w));
+    const t=((await r.json()).parse||{}).wikitext||'';let acc='',first='',us='';
+    t.split('\n').forEach(l=>{const a=l.match(/\{\{a(?:ccent)?\|([^}]+)\}\}/);if(a)acc=a[1];const m=l.match(/\{\{IPA\|en\|([^|}]+)/);
+      if(m){if(!first)first=m[1];if(!us&&/\b(US|GA|GenAm)\b/.test(acc+' '+l))us=m[1];}});
+    ipa=us||first;
+  }catch(e){}}
+  if($('pwIn').value.trim().toLowerCase().replace(/[^a-z' -]/g,'')!==w)return; // 그 사이 다른 단어를 고른 경우
+  $('pwOut').innerHTML=`<div style="margin-top:16px"><div style="font-family:Georgia,serif;font-size:24px;font-weight:700">${esc(w)}</div>`+
+    `<div class="ipa">${ipa?esc(ipa):'<span class="tiny">발음기호를 찾지 못했어요 — 아래 YouGlish로 확인하세요</span>'}</div>`+
+    `<div class="rt-actions" style="justify-content:flex-start">${audio?'<button class="btn-ghost" id="pwRec">🔊 원어민 녹음</button>':''}<button class="btn-ghost" id="pwSlow">🐢 느리게</button><button class="btn-ghost" id="pwNorm">🔊 보통</button>`+
+    `<a class="btn-ghost" style="text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:600" href="https://youglish.com/pronounce/${encodeURIComponent(w)}/english/us" target="_blank" rel="noopener">YouGlish ↗</a></div>`+
+    `<p class="tiny" style="line-height:1.7">① 원어민 소리를 듣고 10번 따라 하기 → ② 그 단어가 들어간 오늘 문장을 3번 말하기 → ③ 같은 발음이 들어간 단어 15개는 Claude에게 "<b>${esc(ipa||w)}</b> 발음이 들어간 단어 15개 추천해줘"라고 물어보세요.</p>`+
+    `<div class="rt-actions" style="justify-content:flex-start"><button class="btn-primary" id="pwDone">교정 완료 ✓</button></div></div>`;
+  if(audio)$('pwRec').onclick=()=>{try{new Audio(audio).play();}catch(e){}};
+  $('pwSlow').onclick=()=>say(w,null,.6);
+  $('pwNorm').onclick=()=>say(w,null,.95);
+  $('pwDone').onclick=()=>{
+    RT.pron=(RT.pron||[]).filter(n=>n.w!==w);RT.pron.push({w,ipa,d:todayStr()});rtMark('pron');
+    rtDoneScreen('발음 노트에 저장했어요',`<b>${esc(w)}</b> ${esc(ipa)} — 내일 섀도잉할 때 이 단어를 한 번 더 신경 써 보세요.`);
+  };
+}
+/* ---------- 5. 자기 전 테스트 ---------- */
+function rtNight(){
+  const ids=rtLastIds();if(!ids.length){rtHome();return;}
+  rtQuiz(ids,{label:'🌙 자기 전 테스트',head:`최근 외운 ${ids.length}문장 다시 말하기`,done:ctx=>{
+    rtMark('night');
+    pushHist({d:todayStr(),mode:'routine',set:-1,label:'루틴 · 자기 전 테스트',score:Math.round(100*ctx.known/ctx.total)});
+    rtDoneScreen('오늘 루틴 끝!',`${ctx.total}문장 중 ${ctx.known}개를 한 번에 말했어요. 내일 출근길 복습에서 다시 만나요.`);
+  }});
+}
+/* ---------- 설정 · 기기 간 진도 옮기기 ---------- */
+$('rtDaily').onchange=e=>{RT.daily=+e.target.value;rtSave();renderHome();};
+$('rtExport').onclick=async()=>{
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify({RT,hist:getHist()}))));
+  try{await navigator.clipboard.writeText(code);alert('진도 코드를 복사했어요. 다른 기기에서 [가져오기]에 붙여넣으세요.');}
+  catch(e){prompt('아래 코드를 전체 복사하세요',code);}
+};
+$('rtImport').onclick=()=>{
+  const code=prompt('다른 기기에서 복사한 진도 코드를 붙여넣으세요.\n(이 기기의 진도는 덮어써집니다)');if(!code)return;
+  try{
+    const o=JSON.parse(decodeURIComponent(escape(atob(code.trim()))));if(!o.RT||!o.RT.cards)throw 0;
+    RT=o.RT;rtSave();if(Array.isArray(o.hist))localStorage.setItem(KEY,JSON.stringify(o.hist));
+    renderHome();alert('진도를 가져왔어요!');
+  }catch(e){alert('코드가 올바르지 않아요. 전체를 복사했는지 확인해 주세요.');}
+};
 /* ================= wire home ================= */
 $('startFull').onclick=()=>startTest(+$('fullSet').value,['q12','q34','q57','q810','q11'],'실전 풀세트');
 $('startPart').onclick=()=>{
